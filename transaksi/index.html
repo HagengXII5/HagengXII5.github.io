@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daftar Transaksi — Klik Madura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#D4262C;
+    --green:#0F6B3A;
+    --amber:#B8860B;
+    --cream:#FFFBF2;
+    --ink:#1E1B16;
+    --line:#EDE6D6;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:'Plus Jakarta Sans', sans-serif;
+    background:var(--cream);
+    color:var(--ink);
+    line-height:1.55;
+  }
+  h1,h2,h3{font-family:'Baloo 2', sans-serif;}
+  a{text-decoration:none; color:inherit;}
+  .wrap{max-width:960px; margin:0 auto; padding:0 24px;}
+
+  header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:20px 24px; border-bottom:1px solid var(--line);
+  }
+  .logo{display:flex; align-items:center; gap:10px; font-weight:800; font-size:20px;}
+  .logo img{height:50px; width:auto; display:block;}
+
+  nav{display:flex; align-items:center; gap:28px;}
+  nav a{font-size:15px; font-weight:600; color:var(--ink); opacity:.7;}
+  nav a:hover{opacity:1; color:var(--red);}
+  nav a.active{opacity:1; color:var(--red);}
+  .cart-badge{
+    position:relative; display:inline-flex; align-items:center; gap:4px;
+  }
+  .cart-badge .count{
+    position:absolute; top:-8px; right:-10px; background:var(--red); color:#fff;
+    font-size:10px; font-weight:800; padding:2px 6px; border-radius:999px; min-width:18px;
+    text-align:center; display:none;
+  }
+  .cart-badge .count.show{display:block;}
+  @media (max-width:700px){
+    nav{gap:16px;}
+    nav a{font-size:13px;}
+  }
+
+  .page-head{padding:40px 0 24px; text-align:center;}
+  .page-head h1{font-size:clamp(26px,4vw,36px); margin-bottom:8px;}
+  .page-head p{color:#5c5648; font-size:15px;}
+
+  .filter-tabs{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:28px;}
+  .filter-tabs button{
+    padding:8px 16px; border-radius:999px; border:1px solid var(--line);
+    background:#fff; font-family:inherit; font-weight:600; font-size:13px; color:var(--ink); cursor:pointer;
+  }
+  .filter-tabs button.active{background:var(--ink); color:#fff; border-color:var(--ink);}
+
+  .trx-list{display:flex; flex-direction:column; gap:14px; padding-bottom:60px;}
+  .trx-card{
+    background:#fff; border:1px solid var(--line); border-radius:16px; padding:20px 22px;
+  }
+  .trx-top{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; gap:12px;}
+  .trx-id{font-size:12px; color:#999; margin-bottom:2px;}
+  .trx-date{font-size:13px; color:#666;}
+  .trx-status{
+    font-size:11px; font-weight:700; padding:4px 12px; border-radius:999px; white-space:nowrap;
+  }
+  .status-selesai{background:#E7F5EC; color:var(--green);}
+  .status-proses{background:#FCEDE3; color:var(--red);}
+  .status-batal{background:#EFEAE1; color:#8a8375;}
+
+  .trx-items{font-size:13px; color:#555; margin-bottom:12px; padding-left:2px;}
+  .trx-bottom{
+    display:flex; justify-content:space-between; align-items:center;
+    border-top:1px solid var(--line); padding-top:12px;
+  }
+  .trx-store{font-size:12px; color:#888;}
+  .trx-total{font-weight:800; color:var(--ink); font-size:15px;}
+  .trx-total b{color:var(--green);}
+
+  footer{ text-align:center; padding:30px 24px; font-size:13px; color:#999; }
+</style>
+</head>
+<body>
+
+  <header>
+    <a href="/" class="logo"><img src="../img/logo_klik_madura_v3_biru.svg" alt="Klik Madura">Klik Madura</a>
+    <nav>
+      <a href="/produk">Daftar Barang</a>
+      <a href="/transaksi" class="active">Daftar Transaksi</a>
+      <a href="/toko">Toko</a>
+      <a href="/checkout" class="cart-badge">🛒<span class="count" id="cartCount">0</span></a>
+    </nav>
+  </header>
+
+  <div class="wrap">
+    <div class="page-head">
+      <h1>Daftar Transaksi</h1>
+      <p>Riwayat belanja kamu dari warung Klik Madura.</p>
+    </div>
+
+    <div class="filter-tabs">
+      <button class="active" data-f="semua">Semua</button>
+      <button data-f="selesai">Selesai</button>
+      <button data-f="proses">Diproses</button>
+      <button data-f="batal">Dibatalkan</button>
+    </div>
+
+    <div class="trx-list" id="trxList">
+      <!-- Transaksi akan di-render via JavaScript -->
+    </div>
+  </div>
+
+  <footer>
+    © 2026 Klik Madura — desain referensi, bukan produk resmi.
+  </footer>
+
+  <script>
+    // Load transactions dari localStorage
+    const savedTrx = JSON.parse(localStorage.getItem('klikMaduraTransactions') || '[]');
+    
+    // Dummy transactions jika tidak ada data
+    const dummyTrx = [
+      {
+        orderNo: '#KM-20260729-014',
+        date: '2026-07-29T21:12:00',
+        items: 'Kopi Sachet Robusta x2, Mie Goreng x3, Air Mineral 600ml x1',
+        store: 'Warung Madura Margonda',
+        total: 39500,
+        status: 'selesai'
+      },
+      {
+        orderNo: '#KM-20260728-009',
+        date: '2026-07-28T08:47:00',
+        items: 'Tisu Gulung x2, Sabun Cuci Piring Sachet x5, Teh Celup x1',
+        store: 'Warung Madura Margonda',
+        total: 25000,
+        status: 'selesai'
+      },
+      {
+        orderNo: '#KM-20260727-002',
+        date: '2026-07-27T23:58:00',
+        items: 'Pulsa Rp20.000 x1',
+        store: 'Warung Madura Kartini',
+        total: 22000,
+        status: 'batal'
+      }
+    ];
+    
+    const transactions = savedTrx.length > 0 ? savedTrx : dummyTrx;
+    
+    const money = n => 'Rp' + n.toLocaleString('id-ID');
+    
+    function formatDate(dateStr) {
+      const d = new Date(dateStr);
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+      return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}, ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    }
+    
+    function getStatusClass(status) {
+      if (status === 'selesai') return 'status-selesai';
+      if (status === 'proses') return 'status-proses';
+      return 'status-batal';
+    }
+    
+    function getStatusLabel(status) {
+      if (status === 'selesai') return 'Selesai';
+      if (status === 'proses') return 'Diproses';
+      return 'Dibatalkan';
+    }
+    
+    function renderTransactions(filter = 'semua') {
+      const container = document.getElementById('trxList');
+      container.innerHTML = '';
+      
+      const filtered = filter === 'semua' 
+        ? transactions 
+        : transactions.filter(t => t.status === filter);
+      
+      if (filtered.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:40px; color:#999;">Belum ada transaksi.</div>';
+        return;
+      }
+      
+      filtered.forEach(trx => {
+        const card = document.createElement('div');
+        card.className = 'trx-card';
+        card.dataset.status = trx.status;
+        card.innerHTML = `
+          <div class="trx-top">
+            <div>
+              <div class="trx-id">${trx.orderNo}</div>
+              <div class="trx-date">${formatDate(trx.date)}</div>
+            </div>
+            <span class="trx-status ${getStatusClass(trx.status)}">${getStatusLabel(trx.status)}</span>
+          </div>
+          <div class="trx-items">${trx.items}</div>
+          <div class="trx-bottom">
+            <span class="trx-store">${trx.store}</span>
+            <span class="trx-total">Total <b>${money(trx.total)}</b></span>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+    
+    // Filter tabs
+    document.querySelectorAll('.filter-tabs button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-tabs button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderTransactions(btn.dataset.f);
+      });
+    });
+    
+    // Initial render
+    renderTransactions();
+
+    // Update cart badge
+    const cart = JSON.parse(localStorage.getItem('klikMaduraCart') || '[]');
+    const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+    const badge = document.getElementById('cartCount');
+    if (badge && totalQty > 0) {
+      badge.textContent = totalQty;
+      badge.classList.add('show');
+    }
+  </script>
+</body>
+</html>

@@ -36,6 +36,15 @@
   nav a{font-size:15px; font-weight:600; color:var(--ink); opacity:.7;}
   nav a:hover{opacity:1; color:var(--red);}
   nav a.active{opacity:1; color:var(--red);}
+  .cart-badge{
+    position:relative; display:inline-flex; align-items:center; gap:4px;
+  }
+  .cart-badge .count{
+    position:absolute; top:-8px; right:-10px; background:var(--red); color:#fff;
+    font-size:10px; font-weight:800; padding:2px 6px; border-radius:999px; min-width:18px;
+    text-align:center; display:none;
+  }
+  .cart-badge .count.show{display:block;}
   @media (max-width:700px){
     nav{gap:16px;}
     nav a{font-size:13px;}
@@ -92,11 +101,12 @@
 <body>
 
   <header>
-    <a href="index.html" class="logo"><img src="img/logo_klik_madura_v3_biru.svg" alt="Klik Madura">Klik Madura</a>
+    <a href="/" class="logo"><img src="../img/logo_klik_madura_v3_biru.svg" alt="Klik Madura">Klik Madura</a>
     <nav>
-      <a href="barang.html" class="active">Daftar Barang</a>
-      <a href="transaksi.html">Daftar Transaksi</a>
-      <a href="toko.html">Toko</a>
+      <a href="/produk" class="active">Daftar Barang</a>
+      <a href="/transaksi">Daftar Transaksi</a>
+      <a href="/toko">Toko</a>
+      <a href="/checkout" class="cart-badge">🛒<span class="count" id="cartCount">0</span></a>
     </nav>
   </header>
 
@@ -107,7 +117,7 @@
     </div>
 
     <div class="search-row">
-      <input type="text" placeholder="Cari barang, misalnya: kopi, mie, pulsa...">
+      <input type="text" id="searchInput" placeholder="Cari barang, misalnya: kopi, mie, pulsa...">
     </div>
 
     <div class="cat-tabs">
@@ -287,7 +297,7 @@
 
     <div class="cart-bar">
       <span id="cartLabel">Keranjang: 0 item</span>
-      <a href="checkout.html" class="btn-mini">Checkout</a>
+      <a href="/checkout" class="btn-mini">Checkout</a>
     </div>
   </div>
 
@@ -296,27 +306,129 @@
   </footer>
 
   <script>
-    let totalQty = 0;
-    document.querySelectorAll('.qty-box').forEach(box => {
-      const [minus, span, plus] = box.children;
-      let qty = 0;
-      minus.addEventListener('click', () => {
-        if(qty > 0){ qty--; totalQty--; span.textContent = qty; updateCart(); }
-      });
-      plus.addEventListener('click', () => {
-        qty++; totalQty++; span.textContent = qty; updateCart();
-      });
-    });
-    function updateCart(){
-      document.getElementById('cartLabel').textContent = 'Keranjang: ' + totalQty + ' item';
+    // Data barang dengan ID unik
+    const itemsData = [
+      { id: 'kopi-robusta', emoji: '☕', name: 'Kopi Sachet Robusta', desc: '1 renceng isi 10', price: 12000 },
+      { id: 'rokok-filter', emoji: '🚬', name: 'Rokok Filter (bungkus)', desc: 'Isi 16 batang', price: 28000 },
+      { id: 'teh-celup', emoji: '🍵', name: 'Teh Celup', desc: 'Kotak isi 25', price: 9500 },
+      { id: 'mie-goreng', emoji: '🍜', name: 'Mie Goreng', desc: '1 bungkus', price: 3500 },
+      { id: 'mie-kuah', emoji: '🍲', name: 'Mie Kuah Ayam Bawang', desc: '1 bungkus', price: 3500 },
+      { id: 'mie-cup', emoji: '🥡', name: 'Mie Instan Cup', desc: '1 cup', price: 7000 },
+      { id: 'air-mineral', emoji: '🥤', name: 'Air Mineral Botol 600ml', desc: 'Dingin dari kulkas', price: 4000 },
+      { id: 'teh-kotak', emoji: '🧃', name: 'Teh Kotak', desc: 'Kemasan 250ml', price: 5000 },
+      { id: 'susu-cokelat', emoji: '🥛', name: 'Susu Kotak Cokelat', desc: 'Kemasan 200ml', price: 6000 },
+      { id: 'tisu-gulung', emoji: '🧻', name: 'Tisu Gulung', desc: '1 gulung', price: 5500 },
+      { id: 'sabun-cuci', emoji: '🧼', name: 'Sabun Cuci Piring Sachet', desc: 'Isi 1 sachet', price: 1500 },
+      { id: 'korek-api', emoji: '🕯️', name: 'Korek Api Gas', desc: '1 buah', price: 3000 },
+      { id: 'pulsa-20k', emoji: '📱', name: 'Pulsa Rp20.000', desc: 'Semua operator', price: 22000 },
+      { id: 'token-50k', emoji: '⚡', name: 'Token Listrik Rp50.000', desc: 'Untuk semua meteran', price: 52500 },
+      { id: 'paket-data', emoji: '💳', name: 'Paket Data 3GB', desc: 'Masa aktif 30 hari', price: 25000 }
+    ];
+
+    // Load cart dari localStorage
+    let cart = JSON.parse(localStorage.getItem('klikMaduraCart') || '[]');
+
+    // Fungsi save cart ke localStorage
+    function saveCart() {
+      localStorage.setItem('klikMaduraCart', JSON.stringify(cart));
     }
 
+    // Fungsi update tampilan cart
+    function updateCart() {
+      const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+      document.getElementById('cartLabel').textContent = 'Keranjang: ' + totalQty + ' item';
+      
+      // Update badge di header
+      const badge = document.getElementById('cartCount');
+      if (badge) {
+        badge.textContent = totalQty;
+        badge.classList.toggle('show', totalQty > 0);
+      }
+    }
+
+    // Fungsi tambah/kurang item
+    function updateItemQty(itemId, delta) {
+      const itemData = itemsData.find(i => i.id === itemId);
+      if (!itemData) return;
+
+      const existing = cart.find(i => i.id === itemId);
+      if (existing) {
+        existing.qty += delta;
+        if (existing.qty <= 0) {
+          cart = cart.filter(i => i.id !== itemId);
+        }
+      } else if (delta > 0) {
+        cart.push({ ...itemData, qty: delta });
+      }
+      
+      saveCart();
+      updateCart();
+    }
+
+    // Setup qty boxes dengan data binding
+    document.querySelectorAll('.qty-box').forEach((box, index) => {
+      const itemData = itemsData[index];
+      const [minus, span, plus] = box.children;
+      
+      // Load initial qty dari cart
+      const cartItem = cart.find(i => i.id === itemData.id);
+      const initialQty = cartItem ? cartItem.qty : 0;
+      span.textContent = initialQty;
+
+      // Set data-id untuk tracking
+      box.dataset.itemId = itemData.id;
+
+      minus.addEventListener('click', () => {
+        const current = parseInt(span.textContent);
+        if (current > 0) {
+          span.textContent = current - 1;
+          updateItemQty(itemData.id, -1);
+        }
+      });
+
+      plus.addEventListener('click', () => {
+        const current = parseInt(span.textContent);
+        span.textContent = current + 1;
+        updateItemQty(itemData.id, 1);
+      });
+    });
+
+    // Category tabs filter
     document.querySelectorAll('.cat-tabs button').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.cat-tabs button').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
+        
+        const catText = btn.textContent.trim();
+        document.querySelectorAll('.cat-block').forEach(block => {
+          if (catText === 'Semua') {
+            block.style.display = '';
+          } else {
+            const heading = block.querySelector('h2').textContent.trim();
+            block.style.display = heading === catText ? '' : 'none';
+          }
+        });
       });
     });
+
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase();
+      document.querySelectorAll('.cat-block').forEach(block => {
+        let hasMatch = false;
+        block.querySelectorAll('.item-card').forEach(card => {
+          const name = card.querySelector('.item-name').textContent.toLowerCase();
+          const desc = card.querySelector('.item-desc').textContent.toLowerCase();
+          const match = name.includes(query) || desc.includes(query);
+          card.style.display = match ? '' : 'none';
+          if (match) hasMatch = true;
+        });
+        block.style.display = hasMatch || query === '' ? '' : 'none';
+      });
+    });
+
+    // Initial update
+    updateCart();
   </script>
 </body>
 </html>

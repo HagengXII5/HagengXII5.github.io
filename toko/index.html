@@ -36,6 +36,15 @@
   nav a{font-size:15px; font-weight:600; color:var(--ink); opacity:.7;}
   nav a:hover{opacity:1; color:var(--red);}
   nav a.active{opacity:1; color:var(--red);}
+  .cart-badge{
+    position:relative; display:inline-flex; align-items:center; gap:4px;
+  }
+  .cart-badge .count{
+    position:absolute; top:-8px; right:-10px; background:var(--red); color:#fff;
+    font-size:10px; font-weight:800; padding:2px 6px; border-radius:999px; min-width:18px;
+    text-align:center; display:none;
+  }
+  .cart-badge .count.show{display:block;}
   @media (max-width:700px){
     nav{gap:16px;}
     nav a{font-size:13px;}
@@ -93,11 +102,12 @@
 <body>
 
   <header>
-    <a href="index.html" class="logo"><img src="img/logo_klik_madura_v3_biru.svg" alt="Klik Madura">Klik Madura</a>
+    <a href="/" class="logo"><img src="../img/logo_klik_madura_v3_biru.svg" alt="Klik Madura">Klik Madura</a>
     <nav>
-      <a href="barang.html">Daftar Barang</a>
-      <a href="transaksi.html">Daftar Transaksi</a>
-      <a href="toko.html" class="active">Toko</a>
+      <a href="/produk">Daftar Barang</a>
+      <a href="/transaksi">Daftar Transaksi</a>
+      <a href="/toko" class="active">Toko</a>
+      <a href="/checkout" class="cart-badge">🛒<span class="count" id="cartCount">0</span></a>
     </nav>
   </header>
 
@@ -174,6 +184,15 @@
         document.getElementById('dHp').textContent = card.dataset.hp;
       });
     });
+
+    // Update cart badge
+    const cart = JSON.parse(localStorage.getItem('klikMaduraCart') || '[]');
+    const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+    const badge = document.getElementById('cartCount');
+    if (badge && totalQty > 0) {
+      badge.textContent = totalQty;
+      badge.classList.add('show');
+    }
   </script>
 </body>
 </html>
