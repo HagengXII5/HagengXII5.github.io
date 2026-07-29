@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daftar Barang — Klik Madura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#D4262C;
+    --green:#0F6B3A;
+    --cream:#FFFBF2;
+    --ink:#1E1B16;
+    --line:#EDE6D6;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:'Plus Jakarta Sans', sans-serif;
+    background:var(--cream);
+    color:var(--ink);
+    line-height:1.55;
+  }
+  h1,h2,h3{font-family:'Baloo 2', sans-serif;}
+  a{text-decoration:none; color:inherit;}
+  .wrap{max-width:960px; margin:0 auto; padding:0 24px;}
+
+  header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:20px 24px; border-bottom:1px solid var(--line);
+  }
+  .logo{display:flex; align-items:center; gap:10px; font-weight:800; font-size:20px;}
+  .logo img{height:50px; width:auto; display:block;}
+
+  nav{display:flex; align-items:center; gap:28px;}
+  nav a{font-size:15px; font-weight:600; color:var(--ink); opacity:.7;}
+  nav a:hover{opacity:1; color:var(--red);}
+  nav a.active{opacity:1; color:var(--red);}
+  @media (max-width:700px){
+    nav{gap:16px;}
+    nav a{font-size:13px;}
+  }
+
+  .page-head{padding:40px 0 24px; text-align:center;}
+  .page-head h1{font-size:clamp(26px,4vw,36px); margin-bottom:8px;}
+  .page-head p{color:#5c5648; font-size:15px;}
+
+  .search-row{display:flex; justify-content:center; margin-bottom:28px;}
+  .search-row input{
+    width:100%; max-width:420px; padding:12px 16px; border-radius:12px;
+    border:1px solid var(--line); font-family:inherit; font-size:14px; background:#fff;
+  }
+
+  .cat-tabs{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:32px;}
+  .cat-tabs button{
+    padding:8px 16px; border-radius:999px; border:1px solid var(--line);
+    background:#fff; font-family:inherit; font-weight:600; font-size:13px; color:var(--ink); cursor:pointer;
+  }
+  .cat-tabs button.active{background:var(--green); color:#fff; border-color:var(--green);}
+
+  .cat-block{margin-bottom:40px;}
+  .cat-block h2{font-size:19px; margin-bottom:14px; display:flex; align-items:center; gap:8px;}
+
+  .item-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
+  @media (max-width:700px){ .item-grid{grid-template-columns:1fr 1fr;} }
+
+  .item-card{
+    background:#fff; border:1px solid var(--line); border-radius:16px; padding:18px; text-align:left;
+  }
+  .item-emoji{font-size:30px; margin-bottom:10px;}
+  .item-name{font-size:14px; font-weight:700; margin-bottom:4px;}
+  .item-desc{font-size:12px; color:#888; margin-bottom:10px; min-height:28px;}
+  .item-row{display:flex; align-items:center; justify-content:space-between;}
+  .item-price{font-weight:800; color:var(--green); font-size:14px;}
+  .qty-box{display:flex; align-items:center; gap:8px;}
+  .qty-box button{
+    width:26px; height:26px; border-radius:8px; border:1px solid var(--line);
+    background:var(--cream); font-weight:700; cursor:pointer; font-size:14px; line-height:1;
+  }
+  .qty-box span{min-width:14px; text-align:center; font-weight:700; font-size:13px;}
+
+  .cart-bar{
+    position:sticky; bottom:16px; margin:32px auto 0; max-width:420px;
+    background:var(--ink); color:#fff; border-radius:14px; padding:14px 20px;
+    display:flex; align-items:center; justify-content:space-between; font-weight:700; font-size:14px;
+  }
+  .cart-bar .btn-mini{background:var(--red); padding:8px 16px; border-radius:10px; font-size:13px;}
+
+  footer{ text-align:center; padding:30px 24px; font-size:13px; color:#999; }
+</style>
+</head>
+<body>
+
+  <header>
+    <a href="index.html" class="logo"><img src="img/logo_klik_madura_v3_biru.svg" alt="Klik Madura">Klik Madura</a>
+    <nav>
+      <a href="barang.html" class="active">Daftar Barang</a>
+      <a href="transaksi.html">Daftar Transaksi</a>
+      <a href="toko.html">Toko</a>
+    </nav>
+  </header>
+
+  <div class="wrap">
+    <div class="page-head">
+      <h1>Daftar Barang</h1>
+      <p>Semua yang biasa kamu beli di warung, tinggal klik.</p>
+    </div>
+
+    <div class="search-row">
+      <input type="text" placeholder="Cari barang, misalnya: kopi, mie, pulsa...">
+    </div>
+
+    <div class="cat-tabs">
+      <button class="active">Semua</button>
+      <button>☕ Kopi & Rokok</button>
+      <button>🍜 Mie Instan</button>
+      <button>🥤 Minuman</button>
+      <button>🧻 Rumah Tangga</button>
+      <button>🍞 Snack & Roti</button>
+      <button>📶 Pulsa & Token</button>
+    </div>
+
+    <div class="cat-block">
+      <h2>☕ Kopi & Rokok</h2>
+      <div class="item-grid">
+        <div class="item-card">
+          <div class="item-emoji">☕</div>
+          <div class="item-name">Kopi Sachet Robusta</div>
+          <div class="item-desc">1 renceng isi 10</div>
+          <div class="item-row">
+            <span class="item-price">Rp12.000</span>
+            <div class="qty-box"><button>−</button><span>0</span><button>+</button></div>
+          </div>
+        </div>
+        <div class="item-card">
+          <div class="item-emoji">🚬</div>
+          <div class="item-name">Rokok Filter (bungkus)</div>
+          <div class="item-desc">Isi 16 batang</div>
+          <div class="item-row">
+            <span class="item-price">Rp28.000</span>
+            <div class="qty-box"><button>−</button><span>0</span><button>+</button></div>
+          </div>
+        </div>
+        <div class="item-card">
+          <div class="item-emoji">🍵</div>
+          <div class="item-name">Teh Celup</div>
+          <div class="item-desc">Kotak isi 25</div>
+          <div class="item-row">
+            <span class="item-price">Rp9.500</span>
+            <div class="qty-box"><button>−</button><span>0</span><button>+</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cat-block">
+      <h2>🍜 Mie Instan</h2>
+      <div class="item-grid">
+        <div class="item-card">
+          <div class="item-emoji">🍜</div>
+          <div class="item-name">Mie Goreng</div>
+          <div class="item-desc">1 bungkus</div>
+          <div class="item-row">
+            <span class="item-price">Rp3.500</span>
+            <div class="qty-box"><button>−</button><span>0</span><button>+</button></div>
+          </div>
+        </div>
+        <div class="item-card">
+          <div class="item-emoji">🍲</div>
+          <div class="item-name">Mie Kuah Ayam Bawang</div>
+          <div class="item-desc">1 bungkus</div>
+          <div class="item-row">
+            <span class="item-price">Rp3.500</span>
+            <div class="qty-box"><button>−</button><span>0</span><button>+</button></div>
+          </div>
+        </div>
+        <div class="item-card">
+          <div class="item-emoji">🥡</div>
+          <div class="item-name">Mie Instan Cup</div>
+          <div class="item-desc">1 cup</div>
+          <div class="item-row">
+            <span class="item-price">Rp7.000</span>
+            <div class="qty-box"><button>−</button><span>0</span><button>+</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cat-block">
+      <h2>🥤 Minuman Dingin</h2>
+      <div class="item-grid">
+        <div class="item-card">
+          <div class="item-emoji">🥤</div>
+          <div class="item-name">Air Mineral Botol 600ml</div>
+          <div class="item-desc">Dingin dari kulkas</div>
+          <div class="item-row">
+            <span class="item-price">Rp4.000</span>
+            <div class="qty-box"><button>−</button><span>0</span><button>+</button></div>
+          </div>
+        </div>
+        <div class="item-card">
+          <div class="item-emoji">🧃</div>
+          <div class="item-name">Teh Kotak</div>
+          <div class="item-desc">Kemasan 250ml</div>
+          <div class="item-row">
+            <span class="item-price">Rp5.000</span>
+            <div class="qty-box"><button>−</button><span>0</span><button>+</button></div>
+          </div>
+        </div>
+        <div class="item-card">
+          <div class="item-emoji">🥛</div>
+          <div class="item-name">Susu Kotak Cokelat</div>
+          <div class="item-desc">Kemasan 200ml</div>
+          <div class="item-row">
+            <span class="item-price">Rp6.000</span>
+            <div class="qty-box"><button>−</button><span>0</span><button>+</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cat-block">
+      <h2>🧻 Kebutuhan Rumah</h2>
+      <div class="item-grid">
+        <div class="item-card">
+          <div class="item-emoji">🧻</div>
+          <div class="item-name">Tisu Gulung</div>
+          <div class="item-desc">1 gulung</div>
+          <div class="item-row">
+            <span class="item-price">Rp5.500</span>
+            <div class="qty-box"><button>−</button><span>0</span><button>+</button></div>
+          </div>
+        </div>
+        <div class="item-card">
+          <div class="item-emoji">🧼</div>
+          <div class="item-name">Sabun Cuci Piring Sachet</div>
+          <div class="item-desc">Isi 1 sachet</div>
+          <div class="item-row">
+            <span class="item-price">Rp1.500</span>
+            <div class="qty-box"><button>−</button><span>0</span><button>+</button></div>
+          </div>
+        </div>
+        <div class="item-card">
+          <div class="item-emoji">🕯️</div>
+          <div class="item-name">Korek Api Gas</div>
+          <div class="item-desc">1 buah</div>
+          <div class="item-row">
+            <span class="item-price">Rp3.000</span>
+            <div class="qty-box"><button>−</button><span>0</span><button>+</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cat-block">
+      <h2>📶 Pulsa & Token Listrik</h2>
+      <div class="item-grid">
+        <div class="item-card">
+          <div class="item-emoji">📱</div>
+          <div class="item-name">Pulsa Rp20.000</div>
+          <div class="item-desc">Semua operator</div>
+          <div class="item-row">
+            <span class="item-price">Rp22.000</span>
+            <div class="qty-box"><button>−</button><span>0</span><button>+</button></div>
+          </div>
+        </div>
+        <div class="item-card">
+          <div class="item-emoji">⚡</div>
+          <div class="item-name">Token Listrik Rp50.000</div>
+          <div class="item-desc">Untuk semua meteran</div>
+          <div class="item-row">
+            <span class="item-price">Rp52.500</span>
+            <div class="qty-box"><button>−</button><span>0</span><button>+</button></div>
+          </div>
+        </div>
+        <div class="item-card">
+          <div class="item-emoji">💳</div>
+          <div class="item-name">Paket Data 3GB</div>
+          <div class="item-desc">Masa aktif 30 hari</div>
+          <div class="item-row">
+            <span class="item-price">Rp25.000</span>
+            <div class="qty-box"><button>−</button><span>0</span><button>+</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cart-bar">
+      <span id="cartLabel">Keranjang: 0 item</span>
+      <a href="#" class="btn-mini">Checkout</a>
+    </div>
+  </div>
+
+  <footer>
+    © 2026 Klik Madura — desain referensi, bukan produk resmi.
+  </footer>
+
+  <script>
+    let totalQty = 0;
+    document.querySelectorAll('.qty-box').forEach(box => {
+      const [minus, span, plus] = box.children;
+      let qty = 0;
+      minus.addEventListener('click', () => {
+        if(qty > 0){ qty--; totalQty--; span.textContent = qty; updateCart(); }
+      });
+      plus.addEventListener('click', () => {
+        qty++; totalQty++; span.textContent = qty; updateCart();
+      });
+    });
+    function updateCart(){
+      document.getElementById('cartLabel').textContent = 'Keranjang: ' + totalQty + ' item';
+    }
+
+    document.querySelectorAll('.cat-tabs button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.cat-tabs button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

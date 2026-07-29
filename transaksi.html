@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daftar Transaksi — Klik Madura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#D4262C;
+    --green:#0F6B3A;
+    --amber:#B8860B;
+    --cream:#FFFBF2;
+    --ink:#1E1B16;
+    --line:#EDE6D6;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:'Plus Jakarta Sans', sans-serif;
+    background:var(--cream);
+    color:var(--ink);
+    line-height:1.55;
+  }
+  h1,h2,h3{font-family:'Baloo 2', sans-serif;}
+  a{text-decoration:none; color:inherit;}
+  .wrap{max-width:960px; margin:0 auto; padding:0 24px;}
+
+  header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:20px 24px; border-bottom:1px solid var(--line);
+  }
+  .logo{display:flex; align-items:center; gap:10px; font-weight:800; font-size:20px;}
+  .logo img{height:50px; width:auto; display:block;}
+
+  nav{display:flex; align-items:center; gap:28px;}
+  nav a{font-size:15px; font-weight:600; color:var(--ink); opacity:.7;}
+  nav a:hover{opacity:1; color:var(--red);}
+  nav a.active{opacity:1; color:var(--red);}
+  @media (max-width:700px){
+    nav{gap:16px;}
+    nav a{font-size:13px;}
+  }
+
+  .page-head{padding:40px 0 24px; text-align:center;}
+  .page-head h1{font-size:clamp(26px,4vw,36px); margin-bottom:8px;}
+  .page-head p{color:#5c5648; font-size:15px;}
+
+  .filter-tabs{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:28px;}
+  .filter-tabs button{
+    padding:8px 16px; border-radius:999px; border:1px solid var(--line);
+    background:#fff; font-family:inherit; font-weight:600; font-size:13px; color:var(--ink); cursor:pointer;
+  }
+  .filter-tabs button.active{background:var(--ink); color:#fff; border-color:var(--ink);}
+
+  .trx-list{display:flex; flex-direction:column; gap:14px; padding-bottom:60px;}
+  .trx-card{
+    background:#fff; border:1px solid var(--line); border-radius:16px; padding:20px 22px;
+  }
+  .trx-top{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; gap:12px;}
+  .trx-id{font-size:12px; color:#999; margin-bottom:2px;}
+  .trx-date{font-size:13px; color:#666;}
+  .trx-status{
+    font-size:11px; font-weight:700; padding:4px 12px; border-radius:999px; white-space:nowrap;
+  }
+  .status-selesai{background:#E7F5EC; color:var(--green);}
+  .status-proses{background:#FCEDE3; color:var(--red);}
+  .status-batal{background:#EFEAE1; color:#8a8375;}
+
+  .trx-items{font-size:13px; color:#555; margin-bottom:12px; padding-left:2px;}
+  .trx-bottom{
+    display:flex; justify-content:space-between; align-items:center;
+    border-top:1px solid var(--line); padding-top:12px;
+  }
+  .trx-store{font-size:12px; color:#888;}
+  .trx-total{font-weight:800; color:var(--ink); font-size:15px;}
+  .trx-total b{color:var(--green);}
+
+  footer{ text-align:center; padding:30px 24px; font-size:13px; color:#999; }
+</style>
+</head>
+<body>
+
+  <header>
+    <a href="index.html" class="logo"><img src="img/logo_klik_madura_v3_biru.svg" alt="Klik Madura">Klik Madura</a>
+    <nav>
+      <a href="barang.html">Daftar Barang</a>
+      <a href="transaksi.html" class="active">Daftar Transaksi</a>
+      <a href="toko.html">Toko</a>
+    </nav>
+  </header>
+
+  <div class="wrap">
+    <div class="page-head">
+      <h1>Daftar Transaksi</h1>
+      <p>Riwayat belanja kamu dari warung Klik Madura.</p>
+    </div>
+
+    <div class="filter-tabs">
+      <button class="active" data-f="semua">Semua</button>
+      <button data-f="selesai">Selesai</button>
+      <button data-f="proses">Diproses</button>
+      <button data-f="batal">Dibatalkan</button>
+    </div>
+
+    <div class="trx-list" id="trxList">
+
+      <div class="trx-card" data-status="selesai">
+        <div class="trx-top">
+          <div>
+            <div class="trx-id">#KM-20260729-014</div>
+            <div class="trx-date">29 Jul 2026, 21:12</div>
+          </div>
+          <span class="trx-status status-selesai">Selesai</span>
+        </div>
+        <div class="trx-items">Kopi Sachet Robusta x2, Mie Goreng x3, Air Mineral 600ml x1</div>
+        <div class="trx-bottom">
+          <span class="trx-store">Warung Madura Margonda</span>
+          <span class="trx-total">Total <b>Rp39.500</b></span>
+        </div>
+      </div>
+
+      <div class="trx-card" data-status="proses">
+        <div class="trx-top">
+          <div>
+            <div class="trx-id">#KM-20260729-013</div>
+            <div class="trx-date">29 Jul 2026, 14:03</div>
+          </div>
+          <span class="trx-status status-proses">Diproses</span>
+        </div>
+        <div class="trx-items">Token Listrik Rp50.000 x1</div>
+        <div class="trx-bottom">
+          <span class="trx-store">Warung Madura Tole Iskandar</span>
+          <span class="trx-total">Total <b>Rp52.500</b></span>
+        </div>
+      </div>
+
+      <div class="trx-card" data-status="selesai">
+        <div class="trx-top">
+          <div>
+            <div class="trx-id">#KM-20260728-009</div>
+            <div class="trx-date">28 Jul 2026, 08:47</div>
+          </div>
+          <span class="trx-status status-selesai">Selesai</span>
+        </div>
+        <div class="trx-items">Tisu Gulung x2, Sabun Cuci Piring Sachet x5, Teh Celup x1</div>
+        <div class="trx-bottom">
+          <span class="trx-store">Warung Madura Margonda</span>
+          <span class="trx-total">Total <b>Rp25.000</b></span>
+        </div>
+      </div>
+
+      <div class="trx-card" data-status="batal">
+        <div class="trx-top">
+          <div>
+            <div class="trx-id">#KM-20260727-002</div>
+            <div class="trx-date">27 Jul 2026, 23:58</div>
+          </div>
+          <span class="trx-status status-batal">Dibatalkan</span>
+        </div>
+        <div class="trx-items">Pulsa Rp20.000 x1</div>
+        <div class="trx-bottom">
+          <span class="trx-store">Warung Madura Kartini</span>
+          <span class="trx-total">Total <b>Rp22.000</b></span>
+        </div>
+      </div>
+
+      <div class="trx-card" data-status="selesai">
+        <div class="trx-top">
+          <div>
+            <div class="trx-id">#KM-20260725-021</div>
+            <div class="trx-date">25 Jul 2026, 19:30</div>
+          </div>
+          <span class="trx-status status-selesai">Selesai</span>
+        </div>
+        <div class="trx-items">Susu Kotak Cokelat x2, Snack Roti x3, Rokok Filter x1</div>
+        <div class="trx-bottom">
+          <span class="trx-store">Warung Madura Juanda</span>
+          <span class="trx-total">Total <b>Rp47.000</b></span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>
+    © 2026 Klik Madura — desain referensi, bukan produk resmi.
+  </footer>
+
+  <script>
+    document.querySelectorAll('.filter-tabs button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-tabs button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const f = btn.dataset.f;
+        document.querySelectorAll('.trx-card').forEach(card => {
+          card.style.display = (f === 'semua' || card.dataset.status === f) ? '' : 'none';
+        });
+      });
+    });
+  </script>
+</body>
+</html>
