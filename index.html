@@ -170,15 +170,6 @@
     © 2026 Klik Madura
   </footer>
 
-  <script>
-    // Update cart badge
-    const cart = JSON.parse(localStorage.getItem('klikMaduraCart') || '[]');
-    const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
-    const badge = document.getElementById('cartCount');
-    if (badge && totalQty > 0) {
-      badge.textContent = totalQty;
-      badge.classList.add('show');
-    }
-  </script>
+  <script src="./js/cart.js"></script>
 </body>
 </html>

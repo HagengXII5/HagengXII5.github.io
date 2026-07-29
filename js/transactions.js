@@ -1,0 +1,66 @@
+/**
+ * Transaction Management Module
+ * Handles localStorage transaction operations
+ */
+
+// Get all transactions
+function getTransactions() {
+  return JSON.parse(localStorage.getItem('klikMaduraTransactions') || '[]');
+}
+
+// Save transactions
+function saveTransactions(transactions) {
+  localStorage.setItem('klikMaduraTransactions', JSON.stringify(transactions));
+}
+
+// Generate order number
+function generateOrderNumber() {
+  const now = new Date();
+  const dateStr = now.getFullYear() + 
+                  String(now.getMonth() + 1).padStart(2, '0') + 
+                  String(now.getDate()).padStart(2, '0');
+  const timeStr = String(now.getHours()).padStart(2, '0') + 
+                  String(now.getMinutes()).padStart(2, '0') + 
+                  String(now.getSeconds()).padStart(2, '0');
+  return `#KM-${dateStr}-${timeStr}`;
+}
+
+// Add new transaction
+function addTransaction(transactionData) {
+  const transactions = getTransactions();
+  const transaction = {
+    orderNo: generateOrderNumber(),
+    date: new Date().toISOString(),
+    status: 'proses',
+    ...transactionData
+  };
+  
+  transactions.unshift(transaction);
+  saveTransactions(transactions);
+  return transaction;
+}
+
+// Update transaction status
+function updateTransactionStatus(orderNo, newStatus) {
+  const transactions = getTransactions();
+  const transaction = transactions.find(t => t.orderNo === orderNo);
+  
+  if (transaction) {
+    transaction.status = newStatus;
+    saveTransactions(transactions);
+  }
+  
+  return transaction;
+}
+
+// Format date for display
+function formatDate(dateStr) {
+  const d = new Date(dateStr);
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}, ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+// Format currency
+function formatMoney(amount) {
+  return 'Rp' + amount.toLocaleString('id-ID');
+}

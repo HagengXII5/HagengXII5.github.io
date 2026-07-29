@@ -172,27 +172,7 @@
     © 2026 Klik Madura — desain referensi, bukan produk resmi.
   </footer>
 
-  <script>
-    document.querySelectorAll('.store-card').forEach(card => {
-      card.addEventListener('click', () => {
-        document.querySelectorAll('.store-card').forEach(c => c.classList.remove('active'));
-        card.classList.add('active');
-        document.getElementById('dName').textContent = card.dataset.name;
-        document.getElementById('dAddr').textContent = card.dataset.addr;
-        document.getElementById('dJarak').textContent = card.dataset.jarak;
-        document.getElementById('dJam').textContent = card.dataset.jam;
-        document.getElementById('dHp').textContent = card.dataset.hp;
-      });
-    });
-
-    // Update cart badge
-    const cart = JSON.parse(localStorage.getItem('klikMaduraCart') || '[]');
-    const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
-    const badge = document.getElementById('cartCount');
-    if (badge && totalQty > 0) {
-      badge.textContent = totalQty;
-      badge.classList.add('show');
-    }
-  </script>
+  <script src="../js/cart.js"></script>
+  <script src="../js/toko.js"></script>
 </body>
 </html>
