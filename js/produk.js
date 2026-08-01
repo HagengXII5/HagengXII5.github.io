@@ -3,7 +3,10 @@
  * Handles product listing, search, and cart interactions
  */
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  // Wait for products to load from JSON
+  await waitForProducts();
+  
   // Load cart and update displays
   let cart = getCart();
   
@@ -13,10 +16,26 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCartBadge();
   }
 
-  // Setup qty boxes dengan data binding
-  document.querySelectorAll('.qty-box').forEach((box, index) => {
-    const itemData = PRODUCTS[index];
-    if (!itemData) return;
+  // Map product IDs to HTML elements by reading data from HTML
+  const productMap = {};
+  document.querySelectorAll('.item-card').forEach(card => {
+    const name = card.querySelector('.item-name').textContent;
+    const product = PRODUCTS.find(p => p.name === name);
+    if (product) {
+      productMap[product.id] = card;
+    }
+  });
+
+  // Setup qty boxes with data binding
+  document.querySelectorAll('.qty-box').forEach((box) => {
+    const card = box.closest('.item-card');
+    const name = card.querySelector('.item-name').textContent;
+    const itemData = PRODUCTS.find(p => p.name === name);
+    
+    if (!itemData) {
+      console.warn('Product not found in JSON:', name);
+      return;
+    }
     
     const [minus, span, plus] = box.children;
     
