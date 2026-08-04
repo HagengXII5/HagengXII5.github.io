@@ -6,10 +6,46 @@
 document.addEventListener('DOMContentLoaded', () => {
   // Load cart dari localStorage
   let items = getCart();
+  
+  // Wait for products to load, then validate stock
+  waitForProducts().then(() => {
+    validateCartStock();
+  });
 
   const ongkir = 5000;
   const layanan = 1000;
   const cartEl = document.getElementById('cartItems');
+
+  function validateCartStock() {
+    // Remove out-of-stock items from cart
+    const originalLength = items.length;
+    items = items.filter(item => {
+      const product = getProductById(item.id);
+      if (product && !product.inStock) {
+        console.warn('Removed out-of-stock item from cart:', item.name);
+        return false;
+      }
+      return true;
+    });
+    
+    if (items.length < originalLength) {
+      saveCart(items);
+      showStockWarning();
+    }
+    
+    render();
+  }
+  
+  function showStockWarning() {
+    const warningDiv = document.createElement('div');
+    warningDiv.style.cssText = 'background:#fff3cd; border:1px solid #ffc107; color:#856404; padding:12px 16px; border-radius:10px; margin-bottom:20px; font-size:13px;';
+    warningDiv.innerHTML = '⚠️ Beberapa produk di keranjang Anda sudah habis dan telah dihapus otomatis.';
+    
+    const pageHead = document.querySelector('.page-head');
+    pageHead.parentElement.insertBefore(warningDiv, pageHead.nextSibling);
+    
+    setTimeout(() => warningDiv.remove(), 5000);
+  }
 
   function render() {
     const container = cartEl;
@@ -114,6 +150,18 @@ document.addEventListener('DOMContentLoaded', () => {
   // Place order
   document.getElementById('btnPlace').addEventListener('click', () => {
     if (items.length === 0) return;
+    
+    // Final validation - check stock one more time
+    const hasOutOfStock = items.some(item => {
+      const product = getProductById(item.id);
+      return product && !product.inStock;
+    });
+    
+    if (hasOutOfStock) {
+      alert('⚠️ Maaf, ada produk yang sudah habis. Silakan refresh halaman untuk memperbarui keranjang.');
+      validateCartStock();
+      return;
+    }
     
     // Calculate totals
     const subtotal = items.reduce((s, it) => s + it.price * it.qty, 0);

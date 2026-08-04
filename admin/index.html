@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Klik Madura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#D4262C;
+    --green:#0F6B3A;
+    --cream:#FFFBF2;
+    --ink:#1E1B16;
+    --line:#EDE6D6;
+    --blue:#1976D2;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:'Plus Jakarta Sans', sans-serif;
+    background:var(--cream);
+    color:var(--ink);
+    line-height:1.55;
+  }
+  h1,h2,h3{font-family:'Baloo 2', sans-serif;}
+  a{text-decoration:none; color:inherit;}
+  button{font-family:inherit;}
+  .wrap{max-width:1200px; margin:0 auto; padding:0 24px;}
+
+  header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:20px 24px; border-bottom:1px solid var(--line);
+    background:#fff;
+  }
+  .logo{display:flex; align-items:center; gap:10px; font-weight:800; font-size:20px;}
+  .logo img{height:50px; width:auto; display:block;}
+  .admin-badge{
+    background:var(--red); color:#fff; font-size:11px; font-weight:700;
+    padding:4px 10px; border-radius:999px; margin-left:8px;
+  }
+
+  nav{display:flex; align-items:center; gap:20px;}
+  nav a{font-size:14px; font-weight:600; padding:8px 16px; border-radius:8px;}
+  nav a:hover{background:var(--line);}
+
+  .page-head{padding:32px 0 24px;}
+  .page-head h1{font-size:32px; margin-bottom:6px;}
+  .page-head p{color:#666; font-size:15px;}
+
+  .tabs{display:flex; gap:8px; margin-bottom:24px; border-bottom:2px solid var(--line);}
+  .tabs button{
+    padding:12px 20px; border:none; background:none; font-weight:700; font-size:14px;
+    cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-2px;
+    color:#888;
+  }
+  .tabs button.active{color:var(--red); border-bottom-color:var(--red);}
+
+  .tab-content{display:none;}
+  .tab-content.active{display:block;}
+
+  .stats-grid{display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin-bottom:32px;}
+  .stat-card{
+    background:#fff; border:1px solid var(--line); border-radius:12px; padding:20px;
+  }
+  .stat-card .icon{font-size:28px; margin-bottom:8px;}
+  .stat-card .value{font-size:26px; font-weight:800; font-family:'Baloo 2';}
+  .stat-card .label{font-size:13px; color:#888;}
+  @media (max-width:900px){ .stats-grid{grid-template-columns:repeat(2, 1fr);} }
+
+  .card{background:#fff; border:1px solid var(--line); border-radius:16px; padding:24px; margin-bottom:20px;}
+  .card-header{display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;}
+  .card-header h2{font-size:20px;}
+
+  .btn{
+    padding:10px 20px; border-radius:8px; font-weight:700; font-size:14px; cursor:pointer; border:none;
+  }
+  .btn-primary{background:var(--red); color:#fff;}
+  .btn-primary:hover{background:#b81f24;}
+  .btn-success{background:var(--green); color:#fff;}
+  .btn-success:hover{background:#0a5029;}
+  .btn-secondary{background:#666; color:#fff;}
+  .btn-secondary:hover{background:#444;}
+  .btn-outline{background:#fff; border:1px solid var(--line); color:var(--ink);}
+  .btn-outline:hover{background:var(--cream);}
+  .btn-danger{background:#fff; border:1px solid #dc3545; color:#dc3545;}
+  .btn-danger:hover{background:#fff5f5;}
+  .btn-sm{padding:6px 12px; font-size:12px;}
+
+  /* Product Table */
+  .product-table{width:100%; border-collapse:collapse;}
+  .product-table th{
+    text-align:left; font-size:12px; color:#888; font-weight:700;
+    padding:12px; border-bottom:2px solid var(--line); text-transform:uppercase;
+  }
+  .product-table td{
+    padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;
+  }
+  .product-table tr:hover{background:var(--cream);}
+  .product-emoji{font-size:24px;}
+  .product-name{font-weight:700;}
+  .product-desc{font-size:12px; color:#888; margin-top:2px;}
+  .product-price{font-weight:800; color:var(--green);}
+  .badge{
+    display:inline-block; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:700;
+  }
+  .badge-success{background:#E7F5EC; color:var(--green);}
+  .badge-danger{background:#FFE6E6; color:#d32f2f;}
+  .badge-warning{background:#FFF4E6; color:#E65100;}
+  .product-actions{display:flex; gap:8px; flex-wrap:wrap;}
+
+  /* Transaction Table */
+  .trx-table{width:100%; border-collapse:collapse;}
+  .trx-table th{
+    text-align:left; font-size:12px; color:#888; font-weight:700;
+    padding:12px; border-bottom:2px solid var(--line); text-transform:uppercase;
+  }
+  .trx-table td{
+    padding:14px 12px; border-bottom:1px solid var(--line); font-size:13px;
+  }
+  .trx-table tr:hover{background:var(--cream);}
+  .trx-id{font-family:'Courier New', monospace; font-size:12px; font-weight:700;}
+  .trx-user{font-size:12px; color:#666;}
+
+  /* Modal */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,0.5); display:none;
+    align-items:center; justify-content:center; z-index:1000; padding:20px;
+  }
+  .modal-overlay.show{display:flex;}
+  .modal{
+    background:#fff; border-radius:16px; max-width:540px; width:100%; max-height:90vh; overflow-y:auto;
+  }
+  .modal-header{
+    padding:24px 24px 16px; border-bottom:1px solid var(--line);
+  }
+  .modal-header h3{font-size:20px;}
+  .modal-body{padding:24px;}
+  .modal-footer{
+    padding:16px 24px; border-top:1px solid var(--line);
+    display:flex; gap:12px; justify-content:flex-end;
+  }
+
+  .form-group{margin-bottom:18px;}
+  .form-group label{
+    display:block; font-weight:700; font-size:13px; margin-bottom:6px;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea{
+    width:100%; padding:10px 14px; border-radius:8px; border:1px solid var(--line);
+    font-family:inherit; font-size:14px;
+  }
+  .form-group textarea{resize:vertical; min-height:80px;}
+  .form-group small{display:block; margin-top:4px; font-size:12px; color:#888;}
+  .form-row{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+
+  .alert{
+    padding:12px 16px; border-radius:10px; margin-bottom:16px; font-size:13px;
+  }
+  .alert-success{background:#e6f4ea; color:var(--green); border:1px solid #b7e4c7;}
+  .alert-error{background:#ffe6e6; color:#d32f2f; border:1px solid #ffcccc;}
+
+  footer{text-align:center; padding:30px 24px; font-size:13px; color:#999;}
+</style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">
+      <img src="../img/logo_klik_madura_v3_biru.svg" alt="Klik Madura">
+      Klik Madura
+      <span class="admin-badge">ADMIN</span>
+    </div>
+    <nav>
+      <a href="/produk">Lihat Toko</a>
+      <a href="/transaksi">Transaksi</a>
+      <a href="#" onclick="logout(); return false;">Logout</a>
+    </nav>
+  </header>
+
+  <div class="wrap">
+    <div class="page-head">
+      <h1>Admin Dashboard</h1>
+      <p>Kelola produk dan transaksi warung Klik Madura</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="icon">📦</div>
+        <div class="value" id="statProducts">0</div>
+        <div class="label">Total Produk</div>
+      </div>
+      <div class="stat-card">
+        <div class="icon">🏪</div>
+        <div class="value" id="statStores">0</div>
+        <div class="label">Total Toko</div>
+      </div>
+      <div class="stat-card">
+        <div class="icon">📋</div>
+        <div class="value" id="statTransactions">0</div>
+        <div class="label">Total Transaksi</div>
+      </div>
+      <div class="stat-card">
+        <div class="icon">💰</div>
+        <div class="value" id="statRevenue">Rp0</div>
+        <div class="label">Total Pendapatan</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="active" onclick="switchTab('products')">📦 Produk</button>
+      <button onclick="switchTab('stores')">🏪 Toko</button>
+      <button onclick="switchTab('transactions')">📋 Transaksi</button>
+    </div>
+
+    <!-- PRODUCTS TAB -->
+    <div class="tab-content active" id="tab-products">
+      <div class="card">
+        <div class="card-header">
+          <h2>Daftar Produk</h2>
+          <button class="btn btn-primary" onclick="openAddProductModal()">+ Tambah Produk</button>
+        </div>
+        <div id="alertProducts"></div>
+        <table class="product-table">
+          <thead>
+            <tr>
+              <th>Produk</th>
+              <th>Kategori</th>
+              <th>Harga</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="productTableBody">
+            <!-- Products will be rendered here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TRANSACTIONS TAB -->
+    <div class="tab-content" id="tab-transactions">
+      <div class="card">
+        <div class="card-header">
+          <h2>Daftar Transaksi</h2>
+        </div>
+        <div id="alertTransactions"></div>
+        <table class="trx-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>User</th>
+              <th>Items</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Tanggal</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="transactionTableBody">
+            <!-- Transactions will be rendered here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- STORES TAB -->
+    <div class="tab-content" id="tab-stores">
+      <div class="card">
+        <div class="card-header">
+          <h2>Daftar Toko</h2>
+          <button class="btn btn-primary" onclick="openAddStoreModal()">+ Tambah Toko</button>
+        </div>
+        <div id="alertStores"></div>
+        <table class="product-table">
+          <thead>
+            <tr>
+              <th>Nama Toko</th>
+              <th>Alamat</th>
+              <th>Jarak</th>
+              <th>Telepon</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="storeTableBody">
+            <!-- Stores will be rendered here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    © 2026 Klik Madura — Admin Dashboard
+  </footer>
+
+  <!-- ADD/EDIT PRODUCT MODAL -->
+  <div class="modal-overlay" id="productModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle">Tambah Produk</h3>
+      </div>
+      <div class="modal-body">
+        <div id="modalAlert"></div>
+        <form id="productForm">
+          <input type="hidden" id="productId">
+          
+          <div class="form-group">
+            <label>Emoji Produk *</label>
+            <input type="text" id="productEmoji" required maxlength="2" placeholder="☕">
+            <small>Contoh: ☕ 🍜 🥤</small>
+          </div>
+
+          <div class="form-group">
+            <label>Nama Produk *</label>
+            <input type="text" id="productName" required placeholder="Contoh: Kapal Api Special">
+          </div>
+
+          <div class="form-group">
+            <label>Deskripsi</label>
+            <input type="text" id="productDesc" placeholder="Contoh: Kopi + gula, 10 sachet">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Harga (Rp) *</label>
+              <input type="number" id="productPrice" required min="0" placeholder="13500">
+            </div>
+
+            <div class="form-group">
+              <label>Kategori *</label>
+              <select id="productCategory" required>
+                <option value="">Pilih Kategori</option>
+                <option value="Kopi & Minuman Hangat">☕ Kopi & Minuman Hangat</option>
+                <option value="Mie Instan">🍜 Mie Instan</option>
+                <option value="Minuman">🥤 Minuman</option>
+                <option value="Snack & Makanan">🍿 Snack & Makanan</option>
+                <option value="Rumah Tangga">🧻 Rumah Tangga</option>
+                <option value="Pulsa & Token">📶 Pulsa & Token</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="productInStock" checked> Stok Tersedia
+            </label>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeProductModal()">Batal</button>
+        <button class="btn btn-primary" onclick="saveProduct()">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD/EDIT STORE MODAL -->
+  <div class="modal-overlay" id="storeModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="storeModalTitle">Tambah Toko</h3>
+      </div>
+      <div class="modal-body">
+        <div id="storeModalAlert"></div>
+        <form id="storeForm">
+          <input type="hidden" id="storeId">
+          
+          <div class="form-group">
+            <label>Nama Toko *</label>
+            <input type="text" id="storeName" required placeholder="Contoh: Warung Madura Pancoran">
+          </div>
+
+          <div class="form-group">
+            <label>Alamat Lengkap *</label>
+            <textarea id="storeAddress" required rows="2" placeholder="Contoh: Jl. Pancoran Raya No. 15, Jakarta Selatan"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Jarak</label>
+              <input type="text" id="storeDistance" placeholder="Contoh: 1,5 km">
+            </div>
+
+            <div class="form-group">
+              <label>Jam Operasional</label>
+              <input type="text" id="storeHours" placeholder="Contoh: 24 Jam">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Nomor Telepon</label>
+            <input type="tel" id="storePhone" placeholder="Contoh: 0812-3456-7890">
+          </div>
+
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="storeStatus" checked> Toko Buka
+            </label>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeStoreModal()">Batal</button>
+        <button class="btn btn-primary" onclick="saveStore()">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/cart.js"></script>
+  <script src="../js/transactions.js"></script>
+  <script src="../js/products.js"></script>
+  <script src="../js/stores.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/admin.js"></script>
+</body>
+</html>

@@ -28,10 +28,14 @@ function generateOrderNumber() {
 // Add new transaction
 function addTransaction(transactionData) {
   const transactions = getTransactions();
+  const currentUser = getCurrentUser();
+  
   const transaction = {
     orderNo: generateOrderNumber(),
     date: new Date().toISOString(),
     status: 'proses',
+    userId: currentUser ? currentUser.id : null,
+    userName: currentUser ? currentUser.fullName : 'Guest',
     ...transactionData
   };
   

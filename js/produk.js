@@ -37,7 +37,27 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
     
+    // Add out-of-stock styling if needed
+    if (!itemData.inStock) {
+      card.classList.add('out-of-stock');
+      
+      // Add stock badge
+      const badge = document.createElement('div');
+      badge.className = 'stock-badge';
+      badge.textContent = 'HABIS';
+      card.appendChild(badge);
+    }
+    
     const [minus, span, plus] = box.children;
+    
+    // Disable buttons if out of stock
+    if (!itemData.inStock) {
+      minus.disabled = true;
+      plus.disabled = true;
+      span.textContent = 0;
+      box.dataset.itemId = itemData.id;
+      return;
+    }
     
     // Load initial qty dari cart
     const cartItem = cart.find(i => i.id === itemData.id);

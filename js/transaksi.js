@@ -5,7 +5,22 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   // Load transactions dari localStorage
-  const transactions = getTransactions();
+  const allTransactions = getTransactions();
+  const currentUser = getCurrentUser();
+  
+  // Filter transactions by current user (if logged in)
+  const transactions = currentUser && currentUser.role !== 'admin'
+    ? allTransactions.filter(t => t.userId === currentUser.id)
+    : allTransactions;
+  
+  // Show admin notice if admin
+  if (currentUser && currentUser.role === 'admin') {
+    const container = document.getElementById('trxList');
+    const notice = document.createElement('div');
+    notice.style.cssText = 'background:#f0f7ff; border:1px solid #b3d9ff; padding:12px 16px; border-radius:10px; margin-bottom:20px; font-size:13px; color:#0066cc;';
+    notice.innerHTML = '👤 Mode Admin: Menampilkan semua transaksi dari semua user';
+    container.parentElement.insertBefore(notice, container);
+  }
   
   function getStatusClass(status) {
     if (status === 'selesai') return 'status-selesai';
@@ -48,6 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <div>
             <div class="trx-id">${trx.orderNo}</div>
             <div class="trx-date">${formatDate(trx.date)}</div>
+            ${currentUser && currentUser.role === 'admin' && trx.userName ? '<div style="font-size:12px; color:#666; margin-top:2px;">👤 ' + trx.userName + '</div>' : ''}
           </div>
           <span class="trx-status ${getStatusClass(trx.status)}">${getStatusLabel(trx.status)}</span>
         </div>

@@ -9,6 +9,27 @@ let PRODUCTS_LOADED = false;
 // Load products from JSON
 async function loadProductsFromJSON() {
   try {
+    // Check if we have products in localStorage (admin modifications)
+    const storedProducts = localStorage.getItem('klikMaduraProducts');
+    
+    if (storedProducts) {
+      // Load from localStorage
+      const productsArray = JSON.parse(storedProducts);
+      PRODUCTS = productsArray.map(p => ({
+        id: p.id,
+        emoji: p.emoji,
+        name: p.name,
+        desc: p.desc || p.description,
+        price: p.price,
+        category: p.category,
+        inStock: p.inStock,
+        tags: p.tags || []
+      }));
+      PRODUCTS_LOADED = true;
+      return PRODUCTS;
+    }
+    
+    // Otherwise load from JSON file
     const response = await fetch('../data/products.json');
     const data = await response.json();
     
@@ -33,6 +54,25 @@ async function loadProductsFromJSON() {
     PRODUCTS_LOADED = true;
     return PRODUCTS;
   }
+}
+
+// Load products from localStorage (for admin changes)
+function loadProductsFromStorage() {
+  const storedProducts = localStorage.getItem('klikMaduraProducts');
+  if (storedProducts) {
+    const productsArray = JSON.parse(storedProducts);
+    PRODUCTS = productsArray.map(p => ({
+      id: p.id,
+      emoji: p.emoji,
+      name: p.name,
+      desc: p.desc || p.description,
+      price: p.price,
+      category: p.category,
+      inStock: p.inStock,
+      tags: p.tags || []
+    }));
+  }
+  return PRODUCTS;
 }
 
 // Get product by ID

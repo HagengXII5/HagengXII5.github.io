@@ -40,6 +40,12 @@ function updateCartItem(itemId, delta) {
 
 // Add item to cart with full data
 function addToCart(itemData, qty = 1) {
+  // Check if product is in stock
+  if (!itemData.inStock) {
+    console.warn('Cannot add out-of-stock product:', itemData.name);
+    return null;
+  }
+  
   let cart = getCart();
   const existing = cart.find(i => i.id === itemData.id);
   
