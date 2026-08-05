@@ -57,11 +57,10 @@ const DEFAULT_STORES = [
 // Load stores from localStorage or use defaults
 function loadStores() {
   const stored = localStorage.getItem('klikMaduraStores');
-  
   if (stored) {
     STORES = JSON.parse(stored);
   } else {
-    STORES = [...DEFAULT_STORES];
+    STORES = [...DEFAULT_STORES]; // ini yang bikin toko lama "balik"
     saveStores();
   }
   
@@ -122,13 +121,11 @@ function updateStore(id, updates) {
 // Delete store
 function deleteStore(id) {
   const index = STORES.findIndex(s => s.id === id);
-  
   if (index !== -1) {
     const deleted = STORES.splice(index, 1)[0];
-    saveStores();
+    saveStores(); // langsung persist ke localStorage
     return deleted;
   }
-  
   return null;
 }
 

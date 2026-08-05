@@ -464,4 +464,3 @@ function deleteStoreBtn(storeId) {
   alertBox.innerHTML = `<div class="alert alert-success">Toko "${store.name}" berhasil dihapus!</div>`;
   setTimeout(() => alertBox.innerHTML = '', 3000);
 }
-

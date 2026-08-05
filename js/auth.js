@@ -95,7 +95,6 @@ function login(username, password) {
 // Logout function
 function logout() {
   setCurrentUser(null);
-  // Redirect to home
   window.location.href = '/';
 }
 
