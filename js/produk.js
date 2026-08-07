@@ -1,77 +1,54 @@
 /**
  * Produk Page Script
- * Handles product listing, search, and cart interactions
+ * Dynamically renders products and categories from PRODUCTS array (localStorage / JSON)
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Wait for products to load from JSON
   await waitForProducts();
-  
-  // Load cart and update displays
+
   let cart = getCart();
-  
+
+  // ── Helpers ──────────────────────────────────────────────────────────────
+
   function updateCartDisplay() {
     const totalQty = getCartTotalQty();
     document.getElementById('cartLabel').textContent = 'Keranjang: ' + totalQty + ' item';
     updateCartBadge();
   }
 
-  // Map product IDs to HTML elements by reading data from HTML
-  const productMap = {};
-  document.querySelectorAll('.item-card').forEach(card => {
-    const name = card.querySelector('.item-name').textContent;
-    const product = PRODUCTS.find(p => p.name === name);
-    if (product) {
-      productMap[product.id] = card;
-    }
-  });
+  function buildCard(product) {
+    const cartItem = cart.find(i => i.id === product.id);
+    const qty = cartItem ? cartItem.qty : 0;
+    const outOfStock = !product.inStock;
 
-  // Setup qty boxes with data binding
-  document.querySelectorAll('.qty-box').forEach((box) => {
-    const card = box.closest('.item-card');
-    const name = card.querySelector('.item-name').textContent;
-    const itemData = PRODUCTS.find(p => p.name === name);
-    
-    if (!itemData) {
-      console.warn('Product not found in JSON:', name);
-      return;
-    }
-    
-    // Add out-of-stock styling if needed
-    if (!itemData.inStock) {
-      card.classList.add('out-of-stock');
-      
-      // Add stock badge
-      const badge = document.createElement('div');
-      badge.className = 'stock-badge';
-      badge.textContent = 'HABIS';
-      card.appendChild(badge);
-    }
-    
-    const [minus, span, plus] = box.children;
-    
-    // Disable buttons if out of stock
-    if (!itemData.inStock) {
-      minus.disabled = true;
-      plus.disabled = true;
-      span.textContent = 0;
-      box.dataset.itemId = itemData.id;
-      return;
-    }
-    
-    // Load initial qty dari cart
-    const cartItem = cart.find(i => i.id === itemData.id);
-    const initialQty = cartItem ? cartItem.qty : 0;
-    span.textContent = initialQty;
+    const card = document.createElement('div');
+    card.className = 'item-card' + (outOfStock ? ' out-of-stock' : '');
+    card.dataset.productId = product.id;
 
-    // Set data-id untuk tracking
-    box.dataset.itemId = itemData.id;
+    card.innerHTML = `
+      ${outOfStock ? '<div class="stock-badge">HABIS</div>' : ''}
+      <div class="item-emoji">${product.emoji}</div>
+      <div class="item-name">${product.name}</div>
+      <div class="item-desc">${product.desc || ''}</div>
+      <div class="item-row">
+        <span class="item-price">${formatMoney(product.price)}</span>
+        <div class="qty-box">
+          <button class="btn-minus" ${outOfStock ? 'disabled' : ''}>−</button>
+          <span>${qty}</span>
+          <button class="btn-plus" ${outOfStock ? 'disabled' : ''}>+</button>
+        </div>
+      </div>
+    `;
+
+    const span   = card.querySelector('.qty-box span');
+    const minus  = card.querySelector('.btn-minus');
+    const plus   = card.querySelector('.btn-plus');
 
     minus.addEventListener('click', () => {
       const current = parseInt(span.textContent);
       if (current > 0) {
         span.textContent = current - 1;
-        updateCartItem(itemData.id, -1);
+        updateCartItem(product.id, -1);
         cart = getCart();
         updateCartDisplay();
       }
@@ -80,55 +57,121 @@ document.addEventListener('DOMContentLoaded', async () => {
     plus.addEventListener('click', () => {
       const current = parseInt(span.textContent);
       span.textContent = current + 1;
-      
       if (current === 0) {
-        addToCart(itemData, 1);
+        addToCart(product, 1);
       } else {
-        updateCartItem(itemData.id, 1);
+        updateCartItem(product.id, 1);
       }
-      
       cart = getCart();
       updateCartDisplay();
     });
-  });
 
-  // Category tabs filter
-  document.querySelectorAll('.cat-tabs button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.cat-tabs button').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      
-      const catText = btn.textContent.trim();
-      document.querySelectorAll('.cat-block').forEach(block => {
-        if (catText === 'Semua') {
-          block.style.display = '';
-        } else {
-          const heading = block.querySelector('h2').textContent.trim();
-          block.style.display = heading === catText ? '' : 'none';
-        }
-      });
+    return card;
+  }
+
+  // ── Render products grouped by category ─────────────────────────────────
+
+  function renderProducts(productsToShow) {
+    const blocksContainer = document.getElementById('productBlocks');
+    blocksContainer.innerHTML = '';
+
+    if (productsToShow.length === 0) {
+      blocksContainer.innerHTML = `
+        <div style="text-align:center; padding:60px 20px; color:#999;">
+          <div style="font-size:48px; margin-bottom:12px;">🔍</div>
+          <div style="font-weight:600; font-size:16px; color:#555;">Produk tidak ditemukan</div>
+        </div>`;
+      return;
+    }
+
+    // Group by category, preserving insertion order
+    const grouped = {};
+    productsToShow.forEach(p => {
+      if (!grouped[p.category]) grouped[p.category] = [];
+      grouped[p.category].push(p);
     });
-  });
 
-  // Search functionality
-  const searchInput = document.getElementById('searchInput');
-  if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-      const query = e.target.value.toLowerCase();
-      document.querySelectorAll('.cat-block').forEach(block => {
-        let hasMatch = false;
-        block.querySelectorAll('.item-card').forEach(card => {
-          const name = card.querySelector('.item-name').textContent.toLowerCase();
-          const desc = card.querySelector('.item-desc').textContent.toLowerCase();
-          const match = name.includes(query) || desc.includes(query);
-          card.style.display = match ? '' : 'none';
-          if (match) hasMatch = true;
-        });
-        block.style.display = hasMatch || query === '' ? '' : 'none';
-      });
+    Object.entries(grouped).forEach(([category, products]) => {
+      const block = document.createElement('div');
+      block.className = 'cat-block';
+      block.dataset.category = category;
+
+      const grid = document.createElement('div');
+      grid.className = 'item-grid';
+      products.forEach(p => grid.appendChild(buildCard(p)));
+
+      block.innerHTML = `<h2>${category}</h2>`;
+      block.appendChild(grid);
+      blocksContainer.appendChild(block);
     });
   }
 
-  // Initial update
+  // ── Render category tabs ─────────────────────────────────────────────────
+
+  function renderCategoryTabs() {
+    const catTabs = document.getElementById('catTabs');
+    catTabs.innerHTML = '';
+
+    const categories = getCategories(); // ['Semua', ...rest]
+
+    categories.forEach((cat, i) => {
+      const btn = document.createElement('button');
+      btn.textContent = cat;
+      btn.dataset.cat = cat;
+      if (i === 0) btn.classList.add('active');
+
+      btn.addEventListener('click', () => {
+        catTabs.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        // Clear search input when switching categories
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) searchInput.value = '';
+
+        if (cat === 'Semua') {
+          renderProducts(PRODUCTS);
+        } else {
+          renderProducts(PRODUCTS.filter(p => p.category === cat));
+        }
+      });
+
+      catTabs.appendChild(btn);
+    });
+  }
+
+  // ── Search ───────────────────────────────────────────────────────────────
+
+  function setupSearch() {
+    const searchInput = document.getElementById('searchInput');
+    if (!searchInput) return;
+
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.trim().toLowerCase();
+
+      // Reset active category tab to "Semua" while searching
+      document.querySelectorAll('#catTabs button').forEach(b => b.classList.remove('active'));
+      const semua = document.querySelector('#catTabs button[data-cat="Semua"]');
+      if (semua) semua.classList.add('active');
+
+      if (query === '') {
+        renderProducts(PRODUCTS);
+        return;
+      }
+
+      const results = PRODUCTS.filter(p =>
+        p.name.toLowerCase().includes(query) ||
+        (p.desc && p.desc.toLowerCase().includes(query)) ||
+        (p.tags && p.tags.some(tag => tag.toLowerCase().includes(query)))
+      );
+
+      renderProducts(results);
+    });
+  }
+
+  // ── Init ─────────────────────────────────────────────────────────────────
+
+  renderCategoryTabs();
+  renderProducts(PRODUCTS);
+  setupSearch();
   updateCartDisplay();
 });

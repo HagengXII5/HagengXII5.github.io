@@ -271,6 +271,19 @@ function renderTransactions() {
                        trx.status === 'proses' ? 'Proses' : 
                        'Batal';
     
+    // Action buttons based on status
+    let actionButtons = '';
+    if (trx.status === 'proses') {
+      actionButtons = `
+        <button class="btn btn-sm btn-success" onclick="completeTransaction('${trx.orderNo}')" style="margin-right:6px;">✅ Selesaikan</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteTransaction('${trx.orderNo}')">🗑️ Hapus</button>
+      `;
+    } else {
+      actionButtons = `
+        <button class="btn btn-sm btn-danger" onclick="deleteTransaction('${trx.orderNo}')">🗑️ Hapus</button>
+      `;
+    }
+    
     row.innerHTML = `
       <td><div class="trx-id">${trx.orderNo}</div></td>
       <td><div class="trx-user">${trx.userName || 'Guest'}</div></td>
@@ -278,9 +291,7 @@ function renderTransactions() {
       <td style="font-weight:800; color:var(--green);">${formatMoney(trx.total)}</td>
       <td><span class="badge ${statusClass}">${statusLabel}</span></td>
       <td style="font-size:12px; color:#666;">${formatDate(trx.date)}</td>
-      <td>
-        <button class="btn btn-sm btn-danger" onclick="deleteTransaction('${trx.orderNo}')">🗑️ Hapus</button>
-      </td>
+      <td>${actionButtons}</td>
     `;
     tbody.appendChild(row);
   });
@@ -300,6 +311,21 @@ function deleteTransaction(orderNo) {
   
   const alertBox = document.getElementById('alertTransactions');
   alertBox.innerHTML = `<div class="alert alert-success">Transaksi ${orderNo} berhasil dihapus!</div>`;
+  setTimeout(() => alertBox.innerHTML = '', 3000);
+}
+
+function completeTransaction(orderNo) {
+  if (!confirm(`Tandai transaksi ${orderNo} sebagai Selesai?`)) {
+    return;
+  }
+  
+  updateTransactionStatus(orderNo, 'selesai');
+  
+  renderTransactions();
+  updateStats();
+  
+  const alertBox = document.getElementById('alertTransactions');
+  alertBox.innerHTML = `<div class="alert alert-success">Transaksi ${orderNo} berhasil diselesaikan!</div>`;
   setTimeout(() => alertBox.innerHTML = '', 3000);
 }
 
@@ -379,7 +405,6 @@ function openEditStoreModal(storeId) {
   document.getElementById('storeId').value = store.id;
   document.getElementById('storeName').value = store.name;
   document.getElementById('storeAddress').value = store.address;
-  document.getElementById('storeDistance').value = store.distance;
   document.getElementById('storeHours').value = store.hours;
   document.getElementById('storePhone').value = store.phone;
   document.getElementById('storeStatus').checked = store.status === 'open';
@@ -392,10 +417,16 @@ function closeStoreModal() {
   currentEditingStoreId = null;
 }
 
+function generateRandomDistance() {
+  // Random jarak antara 0,3 km - 9,9 km
+  const km = (Math.random() * 9.6 + 0.3).toFixed(1);
+  // Ganti titik dengan koma (format Indonesia)
+  return km.replace('.', ',') + ' km';
+}
+
 function saveStore() {
   const name = document.getElementById('storeName').value.trim();
   const address = document.getElementById('storeAddress').value.trim();
-  const distance = document.getElementById('storeDistance').value.trim();
   const hours = document.getElementById('storeHours').value.trim();
   const phone = document.getElementById('storePhone').value.trim();
   const status = document.getElementById('storeStatus').checked ? 'open' : 'closed';
@@ -407,11 +438,22 @@ function saveStore() {
     modalAlert.innerHTML = '<div class="alert alert-error">Nama toko dan alamat harus diisi.</div>';
     return;
   }
+
+  // Untuk edit: pertahankan jarak yang sudah ada. Untuk tambah baru: generate random.
+  let distance;
+  if (currentEditingStoreId) {
+    const existing = getStoreById(currentEditingStoreId);
+    distance = (existing && existing.distance && existing.distance !== '-')
+      ? existing.distance
+      : generateRandomDistance();
+  } else {
+    distance = generateRandomDistance();
+  }
   
   const storeData = {
     name,
     address,
-    distance: distance || '-',
+    distance,
     hours: hours || '24 Jam',
     phone,
     status

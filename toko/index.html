@@ -103,6 +103,9 @@
     font-size:11px; font-weight:700; padding:3px 10px; border-radius:999px;
     background:#E7F5EC; color:var(--green); white-space:nowrap;
   }
+  .store-status--closed{
+    background:#FFE8E8; color:var(--red);
+  }
   .store-addr{font-size:13px; color:#666; margin-bottom:10px;}
   .store-meta{display:flex; gap:14px; font-size:12px; color:#888; flex-wrap:wrap;}
   .store-meta b{color:var(--ink);}
@@ -153,43 +156,8 @@
     </div>
 
     <div class="layout">
-      <div class="store-list" id="storeList">
-        <div class="store-card active" data-name="Warung Madura Jl. Margonda Raya" data-addr="Jl. Margonda Raya No. 45, Depok" data-jarak="0,8 km" data-jam="24 Jam" data-hp="0812-3456-7801">
-          <div class="store-top">
-            <span class="store-name">Warung Madura Margonda</span>
-            <span class="store-status">Buka</span>
-          </div>
-          <div class="store-addr">Jl. Margonda Raya No. 45, Depok</div>
-          <div class="store-meta"><span>📍 <b>0,8 km</b></span><span>🕛 <b>24 Jam</b></span></div>
-        </div>
-
-        <div class="store-card" data-name="Warung Madura Jl. Tole Iskandar" data-addr="Jl. Tole Iskandar No. 12, Depok" data-jarak="1,4 km" data-jam="24 Jam" data-hp="0812-3456-7802">
-          <div class="store-top">
-            <span class="store-name">Warung Madura Tole Iskandar</span>
-            <span class="store-status">Buka</span>
-          </div>
-          <div class="store-addr">Jl. Tole Iskandar No. 12, Depok</div>
-          <div class="store-meta"><span>📍 <b>1,4 km</b></span><span>🕛 <b>24 Jam</b></span></div>
-        </div>
-
-        <div class="store-card" data-name="Warung Madura Jl. Kartini" data-addr="Jl. Kartini No. 8, Depok" data-jarak="2,1 km" data-jam="24 Jam" data-hp="0812-3456-7803">
-          <div class="store-top">
-            <span class="store-name">Warung Madura Kartini</span>
-            <span class="store-status">Buka</span>
-          </div>
-          <div class="store-addr">Jl. Kartini No. 8, Depok</div>
-          <div class="store-meta"><span>📍 <b>2,1 km</b></span><span>🕛 <b>24 Jam</b></span></div>
-        </div>
-
-        <div class="store-card" data-name="Warung Madura Jl. Juanda" data-addr="Jl. Ir. H. Juanda No. 30, Depok" data-jarak="3,0 km" data-jam="24 Jam" data-hp="0812-3456-7804">
-          <div class="store-top">
-            <span class="store-name">Warung Madura Juanda</span>
-            <span class="store-status">Buka</span>
-          </div>
-          <div class="store-addr">Jl. Ir. H. Juanda No. 30, Depok</div>
-          <div class="store-meta"><span>📍 <b>3,0 km</b></span><span>🕛 <b>24 Jam</b></span></div>
-        </div>
-      </div>
+      <!-- Store cards are rendered dynamically by toko.js from localStorage -->
+      <div class="store-list" id="storeList"></div>
 
       <div class="map-panel">
         <div class="map-visual"><span class="pin">📍</span></div>

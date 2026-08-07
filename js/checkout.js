@@ -130,13 +130,33 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSummary();
   });
 
-  // Store pick
-  document.querySelectorAll('.store-opt').forEach(opt => {
-    opt.addEventListener('click', () => {
-      document.querySelectorAll('.store-opt').forEach(o => o.classList.remove('active'));
-      opt.classList.add('active');
+  // Store pick — rendered dynamically from localStorage
+  function renderStorePick() {
+    const storePick = document.getElementById('storePick');
+    const stores = getStores().filter(s => s.status === 'open');
+
+    storePick.innerHTML = '';
+
+    if (stores.length === 0) {
+      storePick.innerHTML = '<p style="font-size:13px; color:#999; padding:8px 0;">Tidak ada toko yang tersedia saat ini.</p>';
+      return;
+    }
+
+    stores.forEach((store, i) => {
+      const opt = document.createElement('div');
+      opt.className = 'store-opt' + (i === 0 ? ' active' : '');
+      opt.dataset.storeId = store.id;
+      opt.dataset.fee = '0';
+      opt.innerHTML = `<b>${store.name}</b><span>${store.distance} · ${store.hours}</span>`;
+      opt.addEventListener('click', () => {
+        storePick.querySelectorAll('.store-opt').forEach(o => o.classList.remove('active'));
+        opt.classList.add('active');
+      });
+      storePick.appendChild(opt);
     });
-  });
+  }
+
+  renderStorePick();
 
   // Payment pick
   document.querySelectorAll('.pay-opt').forEach(opt => {
@@ -170,9 +190,19 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Get delivery info
     const deliveryMethod = optAntar.classList.contains('active') ? 'antar' : 'ambil';
-    const selectedStore = deliveryMethod === 'ambil' 
-      ? document.querySelector('.store-opt.active b')?.textContent || 'Warung Madura Margonda'
-      : 'Warung Madura Margonda';
+    let selectedStore = 'Warung Madura Margonda';
+    if (deliveryMethod === 'ambil') {
+      const activeStoreOpt = document.querySelector('#storePick .store-opt.active');
+      if (activeStoreOpt) {
+        const storeId = activeStoreOpt.dataset.storeId;
+        const storeData = storeId ? getStoreById(storeId) : null;
+        selectedStore = storeData ? storeData.name : (activeStoreOpt.querySelector('b')?.textContent || selectedStore);
+      }
+    } else {
+      // For delivery, pick the first available open store
+      const firstStore = getStores().find(s => s.status === 'open');
+      if (firstStore) selectedStore = firstStore.name;
+    }
     
     // Create items text
     const itemsText = items.map(it => `${it.name} x${it.qty}`).join(', ');
