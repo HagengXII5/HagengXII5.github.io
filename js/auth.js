@@ -1,20 +1,12 @@
-/**
- * Authentication Module (localStorage version)
- * For GitHub Pages - simulates backend authentication
- * 
- * For production with MySQL backend, replace with API calls
- */
 
-// Initialize users in localStorage (first time setup)
 function initializeUsers() {
   const users = getUsers();
   if (users.length === 0) {
-    // Add default admin
     const defaultUsers = [
       {
         id: 1,
         username: 'admin',
-        password: 'admin123', // In production, this should be hashed
+        password: 'admin123',
         fullName: 'Administrator',
         email: 'admin@klikmadura.com',
         phone: '',
@@ -28,26 +20,21 @@ function initializeUsers() {
   }
 }
 
-// Get all users
 function getUsers() {
   return JSON.parse(localStorage.getItem('klikMaduraUsers') || '[]');
 }
 
-// Save users
 function saveUsers(users) {
   localStorage.setItem('klikMaduraUsers', JSON.stringify(users));
 }
 
-// Get current logged-in user
 function getCurrentUser() {
   const userStr = localStorage.getItem('klikMaduraCurrentUser');
   return userStr ? JSON.parse(userStr) : null;
 }
 
-// Set current user
 function setCurrentUser(user) {
   if (user) {
-    // Don't store password in current user session
     const { password, ...userWithoutPassword } = user;
     localStorage.setItem('klikMaduraCurrentUser', JSON.stringify(userWithoutPassword));
   } else {
@@ -55,28 +42,23 @@ function setCurrentUser(user) {
   }
 }
 
-// Check if user is logged in
 function isLoggedIn() {
   return getCurrentUser() !== null;
 }
 
-// Check if user is admin
 function isAdmin() {
   const user = getCurrentUser();
   return user && user.role === 'admin';
 }
 
-// Login function
 function login(username, password) {
   const users = getUsers();
   const user = users.find(u => u.username === username && u.password === password && u.isActive);
   
   if (user) {
-    // Update last login
     user.lastLogin = new Date().toISOString();
     saveUsers(users);
     
-    // Set current user
     setCurrentUser(user);
     
     return {
@@ -92,17 +74,14 @@ function login(username, password) {
   };
 }
 
-// Logout function
 function logout() {
   setCurrentUser(null);
   window.location.href = '/';
 }
 
-// Register new user
 function register(userData) {
   const users = getUsers();
   
-  // Check if username already exists
   if (users.find(u => u.username === userData.username)) {
     return {
       success: false,
@@ -110,7 +89,6 @@ function register(userData) {
     };
   }
   
-  // Check if email already exists
   if (userData.email && users.find(u => u.email === userData.email)) {
     return {
       success: false,
@@ -118,11 +96,10 @@ function register(userData) {
     };
   }
   
-  // Create new user
   const newUser = {
     id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1,
     username: userData.username,
-    password: userData.password, // In production, hash this
+    password: userData.password,
     fullName: userData.fullName,
     email: userData.email || '',
     phone: userData.phone || '',
@@ -142,7 +119,6 @@ function register(userData) {
   };
 }
 
-// Update user profile
 function updateProfile(userId, updates) {
   const users = getUsers();
   const userIndex = users.findIndex(u => u.id === userId);
@@ -151,11 +127,9 @@ function updateProfile(userId, updates) {
     return { success: false, message: 'User tidak ditemukan.' };
   }
   
-  // Update user data
   users[userIndex] = { ...users[userIndex], ...updates };
   saveUsers(users);
   
-  // Update current user if it's the same user
   const currentUser = getCurrentUser();
   if (currentUser && currentUser.id === userId) {
     setCurrentUser(users[userIndex]);
@@ -168,23 +142,18 @@ function updateProfile(userId, updates) {
   };
 }
 
-// Get user transactions
 function getUserTransactions(userId) {
   const allTransactions = getTransactions();
   return allTransactions.filter(t => t.userId === userId);
 }
 
-// Sync cart with user (when login)
 function syncUserCart(userId) {
   const localCart = getCart();
   if (localCart.length > 0) {
-    // In a real backend, you would merge local cart with server cart
-    // For now, we just keep the local cart
     console.log('Cart synced for user:', userId);
   }
 }
 
-// Require login - redirect to login page if not logged in
 function requireLogin() {
   if (!isLoggedIn()) {
     const currentPath = window.location.pathname;
@@ -194,7 +163,6 @@ function requireLogin() {
   return true;
 }
 
-// Require admin - redirect if not admin
 function requireAdmin() {
   if (!isAdmin()) {
     alert('Akses ditolak. Halaman ini hanya untuk admin.');
@@ -204,10 +172,8 @@ function requireAdmin() {
   return true;
 }
 
-// Initialize on load
 initializeUsers();
 
-// Update header to show login/logout
 function updateAuthUI() {
   const user = getCurrentUser();
   const authContainer = document.getElementById('authContainer');
@@ -226,7 +192,6 @@ function updateAuthUI() {
       </div>
     `;
     
-    // Add hover handlers with delay
     setupDropdownHandlers();
   } else {
     authContainer.innerHTML = `
@@ -236,7 +201,6 @@ function updateAuthUI() {
   }
 }
 
-// Setup dropdown hover handlers with delay
 let dropdownTimeout;
 function setupDropdownHandlers() {
   const userMenu = document.getElementById('userMenu');
@@ -244,25 +208,21 @@ function setupDropdownHandlers() {
   
   if (!userMenu || !userDropdown) return;
   
-  // Show dropdown on hover
   userMenu.addEventListener('mouseenter', () => {
     clearTimeout(dropdownTimeout);
     userDropdown.style.display = 'block';
   });
   
-  // Hide dropdown with delay when mouse leaves
   userMenu.addEventListener('mouseleave', () => {
     dropdownTimeout = setTimeout(() => {
       userDropdown.style.display = 'none';
-    }, 200); // 200ms delay before hiding
+    }, 200);
   });
   
-  // Keep dropdown open when hovering over it
   userDropdown.addEventListener('mouseenter', () => {
     clearTimeout(dropdownTimeout);
   });
   
-  // Hide when mouse leaves dropdown
   userDropdown.addEventListener('mouseleave', () => {
     dropdownTimeout = setTimeout(() => {
       userDropdown.style.display = 'none';
@@ -270,5 +230,4 @@ function setupDropdownHandlers() {
   });
 }
 
-// Auto-update auth UI on page load
 document.addEventListener('DOMContentLoaded', updateAuthUI);

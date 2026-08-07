@@ -1,19 +1,11 @@
-/**
- * Transaksi Page Script
- * Displays transaction history with filters
- */
-
 document.addEventListener('DOMContentLoaded', () => {
-  // Load transactions dari localStorage
   const allTransactions = getTransactions();
   const currentUser = getCurrentUser();
   
-  // Filter transactions by current user (if logged in)
   const transactions = currentUser && currentUser.role !== 'admin'
     ? allTransactions.filter(t => t.userId === currentUser.id)
     : allTransactions;
   
-  // Show admin notice if admin
   if (currentUser && currentUser.role === 'admin') {
     const container = document.getElementById('trxList');
     const notice = document.createElement('div');
@@ -77,7 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   
-  // Filter tabs
   document.querySelectorAll('.filter-tabs button').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.filter-tabs button').forEach(b => b.classList.remove('active'));
@@ -86,9 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
   
-  // Initial render
   renderTransactions();
   
-  // Update cart badge
   updateCartBadge();
 });

@@ -1,41 +1,27 @@
-/**
- * Admin Dashboard Script
- * Handles product and transaction management
- */
-
-// Require admin access
 if (!requireAdmin()) {
-  // Will redirect automatically
 }
 
 let currentEditingProductId = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Wait for products to load
   await waitForProducts();
   
-  // Load stores
   loadStores();
   
-  // Render everything
   updateStats();
   renderProducts();
   renderStores();
   renderTransactions();
 });
 
-// Switch tabs
 function switchTab(tab) {
-  // Update tab buttons
   document.querySelectorAll('.tabs button').forEach(btn => btn.classList.remove('active'));
   event.target.classList.add('active');
   
-  // Update tab content
   document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
 }
 
-// Update statistics
 function updateStats() {
   const products = PRODUCTS;
   const transactions = getTransactions();
@@ -52,7 +38,6 @@ function updateStats() {
   document.getElementById('statRevenue').textContent = formatMoney(totalRevenue);
 }
 
-// ===== PRODUCT MANAGEMENT =====
 
 function renderProducts() {
   const tbody = document.getElementById('productTableBody');
@@ -117,7 +102,6 @@ function openEditProductModal(productId) {
   document.getElementById('productDesc').value = product.desc || '';
   document.getElementById('productPrice').value = product.price;
   
-  // Extract category name without emoji
   const categoryName = product.category.replace(/^[^\s]+\s/, '');
   document.getElementById('productCategory').value = categoryName;
   document.getElementById('productInStock').checked = product.inStock;
@@ -141,7 +125,6 @@ function saveProduct() {
   
   const modalAlert = document.getElementById('modalAlert');
   
-  // Validation
   if (!emoji || !name || !price || !category) {
     modalAlert.innerHTML = '<div class="alert alert-error">Semua field wajib harus diisi.</div>';
     return;
@@ -152,7 +135,6 @@ function saveProduct() {
     return;
   }
   
-  // Get category emoji
   const categoryEmojis = {
     'Kopi & Minuman Hangat': '☕',
     'Mie Instan': '🍜',
@@ -177,20 +159,16 @@ function saveProduct() {
   };
   
   if (currentEditingProductId) {
-    // Update existing product
     const index = PRODUCTS.findIndex(p => p.id === currentEditingProductId);
     if (index !== -1) {
       PRODUCTS[index] = productData;
     }
   } else {
-    // Add new product
     PRODUCTS.push(productData);
   }
   
-  // Save to localStorage (simulating JSON update)
   saveProductsToStorage();
   
-  // Close modal and refresh
   closeProductModal();
   renderProducts();
   updateStats();
@@ -242,14 +220,11 @@ function generateProductId() {
 }
 
 function saveProductsToStorage() {
-  // Save products to localStorage (simulating JSON file update)
   localStorage.setItem('klikMaduraProducts', JSON.stringify(PRODUCTS));
   
-  // Also reload products from storage for other pages
   loadProductsFromStorage();
 }
 
-// ===== TRANSACTION MANAGEMENT =====
 
 function renderTransactions() {
   const tbody = document.getElementById('transactionTableBody');
@@ -271,7 +246,6 @@ function renderTransactions() {
                        trx.status === 'proses' ? 'Proses' : 
                        'Batal';
     
-    // Action buttons based on status
     let actionButtons = '';
     if (trx.status === 'proses') {
       actionButtons = `
@@ -329,7 +303,6 @@ function completeTransaction(orderNo) {
   setTimeout(() => alertBox.innerHTML = '', 3000);
 }
 
-// Close modal when clicking outside
 document.getElementById('productModal').addEventListener('click', (e) => {
   if (e.target.id === 'productModal') {
     closeProductModal();
@@ -342,7 +315,6 @@ document.getElementById('storeModal').addEventListener('click', (e) => {
   }
 });
 
-// ===== STORE MANAGEMENT =====
 
 let currentEditingStoreId = null;
 
@@ -405,6 +377,7 @@ function openEditStoreModal(storeId) {
   document.getElementById('storeId').value = store.id;
   document.getElementById('storeName').value = store.name;
   document.getElementById('storeAddress').value = store.address;
+  document.getElementById('storeDistance').value = store.distance;
   document.getElementById('storeHours').value = store.hours;
   document.getElementById('storePhone').value = store.phone;
   document.getElementById('storeStatus').checked = store.status === 'open';
@@ -418,9 +391,7 @@ function closeStoreModal() {
 }
 
 function generateRandomDistance() {
-  // Random jarak antara 0,3 km - 9,9 km
   const km = (Math.random() * 9.6 + 0.3).toFixed(1);
-  // Ganti titik dengan koma (format Indonesia)
   return km.replace('.', ',') + ' km';
 }
 
@@ -433,13 +404,11 @@ function saveStore() {
   
   const modalAlert = document.getElementById('storeModalAlert');
   
-  // Validation
   if (!name || !address) {
     modalAlert.innerHTML = '<div class="alert alert-error">Nama toko dan alamat harus diisi.</div>';
     return;
   }
 
-  // Untuk edit: pertahankan jarak yang sudah ada. Untuk tambah baru: generate random.
   let distance;
   if (currentEditingStoreId) {
     const existing = getStoreById(currentEditingStoreId);
@@ -460,14 +429,11 @@ function saveStore() {
   };
   
   if (currentEditingStoreId) {
-    // Update existing store
     updateStore(currentEditingStoreId, storeData);
   } else {
-    // Add new store
     addStore(storeData);
   }
   
-  // Close modal and refresh
   closeStoreModal();
   renderStores();
   updateStats();

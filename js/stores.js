@@ -1,12 +1,6 @@
-/**
- * Stores Management Module
- * Handles store data and operations
- */
-
 let STORES = [];
 let STORES_LOADED = false;
 
-// Default stores
 const DEFAULT_STORES = [
   {
     id: 'store-margonda',
@@ -54,13 +48,12 @@ const DEFAULT_STORES = [
   }
 ];
 
-// Load stores from localStorage or use defaults
 function loadStores() {
   const stored = localStorage.getItem('klikMaduraStores');
   if (stored) {
     STORES = JSON.parse(stored);
   } else {
-    STORES = [...DEFAULT_STORES]; // ini yang bikin toko lama "balik"
+    STORES = [...DEFAULT_STORES];
     saveStores();
   }
   
@@ -68,12 +61,10 @@ function loadStores() {
   return STORES;
 }
 
-// Save stores to localStorage
 function saveStores() {
   localStorage.setItem('klikMaduraStores', JSON.stringify(STORES));
 }
 
-// Get all stores
 function getStores() {
   if (!STORES_LOADED) {
     loadStores();
@@ -81,12 +72,10 @@ function getStores() {
   return STORES;
 }
 
-// Get store by ID
 function getStoreById(id) {
   return STORES.find(s => s.id === id);
 }
 
-// Add new store
 function addStore(storeData) {
   const newStore = {
     id: generateStoreId(),
@@ -105,7 +94,6 @@ function addStore(storeData) {
   return newStore;
 }
 
-// Update store
 function updateStore(id, updates) {
   const index = STORES.findIndex(s => s.id === id);
   
@@ -118,18 +106,16 @@ function updateStore(id, updates) {
   return null;
 }
 
-// Delete store
 function deleteStore(id) {
   const index = STORES.findIndex(s => s.id === id);
   if (index !== -1) {
     const deleted = STORES.splice(index, 1)[0];
-    saveStores(); // langsung persist ke localStorage
+    saveStores();
     return deleted;
   }
   return null;
 }
 
-// Toggle store status
 function toggleStoreStatus(id) {
   const store = getStoreById(id);
   
@@ -142,19 +128,16 @@ function toggleStoreStatus(id) {
   return null;
 }
 
-// Generate unique store ID
 function generateStoreId() {
   const timestamp = Date.now();
   const random = Math.floor(Math.random() * 1000);
   return `store-${timestamp}-${random}`;
 }
 
-// Get open stores only
 function getOpenStores() {
   return STORES.filter(s => s.status === 'open');
 }
 
-// Get stores count
 function getStoresCount() {
   return {
     total: STORES.length,
@@ -163,5 +146,4 @@ function getStoresCount() {
   };
 }
 
-// Initialize on load
 loadStores();

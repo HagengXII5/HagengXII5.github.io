@@ -1,13 +1,6 @@
-/**
- * Checkout Page Script
- * Handles checkout process, order creation, and payment
- */
-
 document.addEventListener('DOMContentLoaded', () => {
-  // Load cart dari localStorage
   let items = getCart();
   
-  // Wait for products to load, then validate stock
   waitForProducts().then(() => {
     validateCartStock();
   });
@@ -17,7 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const cartEl = document.getElementById('cartItems');
 
   function validateCartStock() {
-    // Remove out-of-stock items from cart
     const originalLength = items.length;
     items = items.filter(item => {
       const product = getProductById(item.id);
@@ -91,7 +83,6 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.disabled = items.length === 0;
   }
 
-  // Cart item actions
   cartEl.addEventListener('click', e => {
     const btn = e.target.closest('button');
     if (!btn) return;
@@ -108,7 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
     render();
   });
 
-  // Delivery toggle
   const optAntar = document.getElementById('optAntar');
   const optAmbil = document.getElementById('optAmbil');
   const antarBlock = document.getElementById('antarBlock');
@@ -130,7 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSummary();
   });
 
-  // Store pick — rendered dynamically from localStorage
   function renderStorePick() {
     const storePick = document.getElementById('storePick');
     const stores = getStores().filter(s => s.status === 'open');
@@ -158,7 +147,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   renderStorePick();
 
-  // Payment pick
   document.querySelectorAll('.pay-opt').forEach(opt => {
     opt.addEventListener('click', () => {
       document.querySelectorAll('.pay-opt').forEach(o => o.classList.remove('active'));
@@ -167,11 +155,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Place order
   document.getElementById('btnPlace').addEventListener('click', () => {
     if (items.length === 0) return;
     
-    // Final validation - check stock one more time
     const hasOutOfStock = items.some(item => {
       const product = getProductById(item.id);
       return product && !product.inStock;
@@ -183,12 +169,10 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     
-    // Calculate totals
     const subtotal = items.reduce((s, it) => s + it.price * it.qty, 0);
     const feeOngkir = optAmbil.classList.contains('active') ? 0 : ongkir;
     const total = subtotal + feeOngkir + layanan;
     
-    // Get delivery info
     const deliveryMethod = optAntar.classList.contains('active') ? 'antar' : 'ambil';
     let selectedStore = 'Warung Madura Margonda';
     if (deliveryMethod === 'ambil') {
@@ -199,15 +183,12 @@ document.addEventListener('DOMContentLoaded', () => {
         selectedStore = storeData ? storeData.name : (activeStoreOpt.querySelector('b')?.textContent || selectedStore);
       }
     } else {
-      // For delivery, pick the first available open store
       const firstStore = getStores().find(s => s.status === 'open');
       if (firstStore) selectedStore = firstStore.name;
     }
     
-    // Create items text
     const itemsText = items.map(it => `${it.name} x${it.qty}`).join(', ');
     
-    // Save transaction
     const transaction = addTransaction({
       items: itemsText,
       itemsData: items,
@@ -216,17 +197,13 @@ document.addEventListener('DOMContentLoaded', () => {
       deliveryMethod
     });
     
-    // Update overlay dengan nomor order
     document.querySelector('.ordno').textContent = transaction.orderNo;
     
-    // Clear cart
     clearCart();
     items = [];
     
-    // Show success overlay
     document.getElementById('overlay').classList.add('show');
   });
 
-  // Initial render
   render();
 });

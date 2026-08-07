@@ -1,12 +1,6 @@
-/**
- * Toko Page Script
- * Handles store location display and selection
- * Dynamically renders store cards from localStorage via stores.js
- */
-
 function renderTokoList() {
   const storeList = document.getElementById('storeList');
-  const stores = getStores(); // from stores.js (reads localStorage)
+  const stores = getStores();
 
   storeList.innerHTML = '';
 
@@ -43,7 +37,6 @@ function renderTokoList() {
       document.querySelectorAll('.store-card').forEach(c => c.classList.remove('active'));
       card.classList.add('active');
 
-      // Update map detail panel
       document.getElementById('dName').textContent  = store.name;
       document.getElementById('dAddr').textContent  = store.address;
       document.getElementById('dJarak').textContent = store.distance;
@@ -54,7 +47,6 @@ function renderTokoList() {
     storeList.appendChild(card);
   });
 
-  // Populate map panel with first store on load
   const first = stores[0];
   document.getElementById('dName').textContent  = first.name;
   document.getElementById('dAddr').textContent  = first.address;
@@ -66,6 +58,5 @@ function renderTokoList() {
 document.addEventListener('DOMContentLoaded', () => {
   renderTokoList();
 
-  // Update cart badge
   updateCartBadge();
 });

@@ -1,19 +1,11 @@
-/**
- * Transaction Management Module
- * Handles localStorage transaction operations
- */
-
-// Get all transactions
 function getTransactions() {
   return JSON.parse(localStorage.getItem('klikMaduraTransactions') || '[]');
 }
 
-// Save transactions
 function saveTransactions(transactions) {
   localStorage.setItem('klikMaduraTransactions', JSON.stringify(transactions));
 }
 
-// Generate order number
 function generateOrderNumber() {
   const now = new Date();
   const dateStr = now.getFullYear() + 
@@ -25,7 +17,6 @@ function generateOrderNumber() {
   return `#KM-${dateStr}-${timeStr}`;
 }
 
-// Add new transaction
 function addTransaction(transactionData) {
   const transactions = getTransactions();
   const currentUser = getCurrentUser();
@@ -44,7 +35,6 @@ function addTransaction(transactionData) {
   return transaction;
 }
 
-// Update transaction status
 function updateTransactionStatus(orderNo, newStatus) {
   const transactions = getTransactions();
   const transaction = transactions.find(t => t.orderNo === orderNo);
@@ -57,14 +47,12 @@ function updateTransactionStatus(orderNo, newStatus) {
   return transaction;
 }
 
-// Format date for display
 function formatDate(dateStr) {
   const d = new Date(dateStr);
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
   return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}, ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
 }
 
-// Format currency
 function formatMoney(amount) {
   return 'Rp' + amount.toLocaleString('id-ID');
 }

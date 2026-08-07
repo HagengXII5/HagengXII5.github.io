@@ -1,14 +1,8 @@
-/**
- * Produk Page Script
- * Dynamically renders products and categories from PRODUCTS array (localStorage / JSON)
- */
-
 document.addEventListener('DOMContentLoaded', async () => {
   await waitForProducts();
 
   let cart = getCart();
 
-  // ── Helpers ──────────────────────────────────────────────────────────────
 
   function updateCartDisplay() {
     const totalQty = getCartTotalQty();
@@ -69,7 +63,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     return card;
   }
 
-  // ── Render products grouped by category ─────────────────────────────────
 
   function renderProducts(productsToShow) {
     const blocksContainer = document.getElementById('productBlocks');
@@ -84,7 +77,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // Group by category, preserving insertion order
     const grouped = {};
     productsToShow.forEach(p => {
       if (!grouped[p.category]) grouped[p.category] = [];
@@ -106,13 +98,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // ── Render category tabs ─────────────────────────────────────────────────
 
   function renderCategoryTabs() {
     const catTabs = document.getElementById('catTabs');
     catTabs.innerHTML = '';
 
-    const categories = getCategories(); // ['Semua', ...rest]
+    const categories = getCategories();
 
     categories.forEach((cat, i) => {
       const btn = document.createElement('button');
@@ -124,7 +115,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         catTabs.querySelectorAll('button').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
 
-        // Clear search input when switching categories
         const searchInput = document.getElementById('searchInput');
         if (searchInput) searchInput.value = '';
 
@@ -139,7 +129,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // ── Search ───────────────────────────────────────────────────────────────
 
   function setupSearch() {
     const searchInput = document.getElementById('searchInput');
@@ -148,7 +137,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     searchInput.addEventListener('input', (e) => {
       const query = e.target.value.trim().toLowerCase();
 
-      // Reset active category tab to "Semua" while searching
       document.querySelectorAll('#catTabs button').forEach(b => b.classList.remove('active'));
       const semua = document.querySelector('#catTabs button[data-cat="Semua"]');
       if (semua) semua.classList.add('active');
@@ -168,7 +156,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // ── Init ─────────────────────────────────────────────────────────────────
 
   renderCategoryTabs();
   renderProducts(PRODUCTS);
