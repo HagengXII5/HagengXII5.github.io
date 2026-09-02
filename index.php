@@ -1,0 +1,154 @@
+<?php
+require_once __DIR__ . '/includes/auth_helpers.php';
+require_once __DIR__ . '/includes/cart_helpers.php';
+require_once __DIR__ . '/includes/helpers.php';
+
+$user    = getCurrentUser();
+$cartQty = $user ? getCartTotalQty((int)$user['id']) : 0;
+?>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Klik Madura — Buka 24 Jam, Tinggal Klik</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/x-icon" href="img/logo_klik_madura.png">
+<style>
+  :root{--red:#D4262C;--green:#0F6B3A;--cream:#FFFBF2;--ink:#1E1B16;--line:#EDE6D6;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--cream);color:var(--ink);line-height:1.55;}
+  h1,h2,h3{font-family:'Baloo 2',sans-serif;}
+  a{text-decoration:none;color:inherit;}
+  .wrap{max-width:960px;margin:0 auto;padding:0 24px;}
+  header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--line);}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;}
+  .logo img{height:50px;width:auto;display:block;}
+  nav{display:flex;align-items:center;gap:28px;}
+  nav a{font-size:15px;font-weight:600;color:var(--ink);opacity:.8;}
+  nav a:hover{opacity:1;color:var(--red);}
+  .cart-badge{position:relative;display:inline-flex;align-items:center;gap:4px;}
+  .cart-badge .count{position:absolute;top:-8px;right:-10px;background:var(--red);color:#fff;font-size:10px;font-weight:800;padding:2px 6px;border-radius:999px;min-width:18px;text-align:center;<?= $cartQty > 0 ? '' : 'display:none;' ?>}
+  .auth-link{font-size:14px;font-weight:600;padding:8px 16px;border-radius:8px;transition:all 0.2s;}
+  .auth-link:hover{background:var(--line);}
+  .auth-register{background:var(--red);color:#fff;}
+  .auth-register:hover{background:#b81f24;}
+  .user-menu{position:relative;}
+  .user-name{font-size:14px;font-weight:600;padding:8px 14px;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:6px;}
+  .user-menu:hover .user-name{background:var(--line);}
+  .user-dropdown{display:none;position:absolute;top:100%;right:0;margin-top:2px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1);min-width:180px;z-index:100;padding-top:2px;}
+  .user-dropdown::before{content:'';position:absolute;top:-12px;left:0;right:0;height:12px;}
+  .user-dropdown a{display:block;padding:12px 16px;font-size:14px;border-bottom:1px solid var(--line);}
+  .user-dropdown a:last-child{border-bottom:none;}
+  .user-dropdown a:hover{background:var(--cream);}
+  .hero{padding:70px 0 50px;text-align:center;}
+  .badge{display:inline-block;background:#FCEDE3;color:var(--red);font-size:13px;font-weight:700;padding:6px 14px;border-radius:999px;margin-bottom:16px;}
+  .hero h1{font-size:clamp(32px,5vw,50px);font-weight:800;margin-bottom:16px;line-height:1.1;}
+  .hero h1 span{color:var(--red);}
+  .hero p{font-size:17px;color:#5c5648;max-width:480px;margin:0 auto 28px;}
+  .hero-ctas{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+  .btn{padding:14px 24px;border-radius:12px;font-weight:700;font-size:15px;}
+  .btn-red{background:var(--red);color:#fff;}
+  .btn-outline{background:#fff;border:2px solid var(--ink);color:var(--ink);}
+  .stats{display:flex;justify-content:center;gap:48px;padding:32px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);flex-wrap:wrap;text-align:center;}
+  .stats b{display:block;font-size:24px;font-family:'Baloo 2';color:var(--green);}
+  .stats span{font-size:13px;color:#777;}
+  section{padding:60px 0;}
+  .sec-title{text-align:center;margin-bottom:36px;}
+  .sec-title h2{font-size:28px;margin-bottom:8px;}
+  .sec-title p{color:#777;font-size:15px;}
+  .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  .feat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:26px 22px;text-align:left;}
+  .feat .icon{font-size:26px;margin-bottom:10px;}
+  .feat h3{font-size:16px;margin-bottom:6px;}
+  .feat p{font-size:14px;color:#666;}
+  @media(max-width:700px){.feat-grid{grid-template-columns:1fr;}nav{gap:16px;}nav a{font-size:13px;}}
+  .cat-list{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
+  .cat-list span{background:#fff;border:1px solid var(--line);padding:9px 16px;border-radius:10px;font-size:14px;font-weight:600;}
+  footer{text-align:center;padding:30px 24px;font-size:13px;color:#999;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><img src="./img/logo_klik_madura_v3_biru.svg" alt="Klik Madura">Klik Madura</div>
+  <nav>
+    <a href="/produk">Daftar Barang</a>
+    <a href="/transaksi">Daftar Transaksi</a>
+    <a href="/toko">Toko</a>
+    <a href="/checkout" class="cart-badge">🛒
+      <span class="count"><?= $cartQty ?></span>
+    </a>
+    <?php if ($user): ?>
+      <div class="user-menu">
+        <div class="user-name">👤 <?= htmlspecialchars($user['full_name'] ?: $user['username']) ?></div>
+        <div class="user-dropdown">
+          <?php if ($user['role'] === 'admin'): ?>
+            <a href="/admin">⚙️ Admin Panel</a>
+          <?php endif; ?>
+          <a href="/transaksi">📋 Transaksi Saya</a>
+          <a href="#" onclick="fetch('/api/logout.php',{method:'POST'}).then(()=>location.href='/')">🚪 Logout</a>
+        </div>
+      </div>
+    <?php else: ?>
+      <a href="/login" class="auth-link">Masuk</a>
+      <a href="/register" class="auth-link auth-register">Daftar</a>
+    <?php endif; ?>
+  </nav>
+</header>
+
+<section class="hero wrap">
+  <span class="badge">🕛 Buka 24 Jam</span>
+  <h1>Tinggal <span>Klik</span>, Warung Langsung Anter.</h1>
+  <p>Belanja kebutuhan harian dari warung Madura langganan kamu — kapan saja, tanpa antre, tanpa ribet.</p>
+  <div class="hero-ctas">
+    <a href="/produk" class="btn btn-red">Mulai Belanja</a>
+    <a href="#kategori" class="btn btn-outline">Lihat Kategori</a>
+  </div>
+</section>
+
+<div class="stats wrap">
+  <div><b>500+</b><span>Warung mitra</span></div>
+  <div><b>24 Jam</b><span>Selalu buka</span></div>
+  <div><b>15 Menit</b><span>Rata-rata antar</span></div>
+</div>
+
+<section id="kelebihan" class="wrap">
+  <div class="sec-title"><br><h2>Kenapa Klik Madura?</h2><p>Dekat, cepat, dan selalu ada saat kamu butuh.</p></div>
+  <div class="feat-grid">
+    <div class="feat"><div class="icon">🌙</div><h3>Buka Tengah Malam</h3><p>Butuh kopi atau rokok jam 2 pagi? Warung mitra kami tetap siap.</p></div>
+    <div class="feat"><div class="icon">🏍️</div><h3>Antar Cepat</h3><p>Diantar langsung dari warung terdekat, biasanya sampai kurang dari 20 menit.</p></div>
+    <div class="feat"><div class="icon">💵</div><h3>Bayar Fleksibel</h3><p>Tunai di tempat, transfer, atau e-wallet — pilih yang paling gampang.</p></div>
+  </div>
+</section>
+
+<section id="kategori" class="wrap">
+  <div class="sec-title"><br><h2>Semua Ada di Warung</h2><p>Kebutuhan harian yang biasa kamu cari, tinggal klik.</p></div>
+  <div class="cat-list">
+    <span>☕ Kopi &amp; Minuman Hangat</span>
+    <span>🍜 Mie Instan</span>
+    <span>🥤 Minuman Dingin</span>
+    <span>🍿 Snack &amp; Makanan</span>
+    <span>🧻 Kebutuhan Rumah</span>
+    <span>📶 Pulsa &amp; Token Listrik</span>
+  </div>
+</section>
+
+<footer>© 2026 Klik Madura</footer>
+
+<script>
+// Dropdown user menu hover
+(function(){
+  const menu = document.querySelector('.user-menu');
+  if (!menu) return;
+  const drop = menu.querySelector('.user-dropdown');
+  let t;
+  menu.addEventListener('mouseenter', () => { clearTimeout(t); drop.style.display = 'block'; });
+  menu.addEventListener('mouseleave', () => { t = setTimeout(() => drop.style.display = 'none', 200); });
+  drop.addEventListener('mouseenter', () => clearTimeout(t));
+  drop.addEventListener('mouseleave', () => { t = setTimeout(() => drop.style.display = 'none', 200); });
+})();
+</script>
+</body>
+</html>
